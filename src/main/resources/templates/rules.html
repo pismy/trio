@@ -1,0 +1,158 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorator="layout">
+<head>
+    <title>Trio - Rules</title>
+    <link href="/resources/css/game.css" rel="stylesheet"/>
+</head>
+<body>
+
+<div layout:fragment="content" class="container">
+
+    <h1>Règles du jeu Trio</h1>
+
+    <p>
+        Trio est un jeu où il faut, en même temps, faire preuve d'observation et de rapidité.<br/>
+        Il est composé de 81 cartes, qui sont toutes absolument différentes et uniques.
+    </p>
+
+    <p>
+        Pour jouer, on place simplement 12 cartes faces visibles sur la table, tous les joueurs jouent en même temps,
+        celui qui trouve le premier un Trio crie "TRIO" et le montre aux autres joueurs, s'il est bon, il empoche les 3
+        cartes du Trio.<br/>
+        On remplacera alors les 3 cartes du Trio par 3 nouvelles prises dans la pioche, de sorte qu'il y ait toujours
+        sur la table 12 cartes faces visibles.<br/>
+        Si le Trio n'est pas bon, le joueur perd une carte (si il en a). Cette carte n’est pas remise en jeu.
+    </p>
+
+    <p>
+        On recommence l'opération jusqu'à ce que toutes les cartes aient été jouées et que plus aucun Trio ne soit
+        possible à l'aide des cartes restantes sur la table.
+    </p>
+
+    <h2>Comment former un Trio ?</h2>
+    <p>
+        Chacune des 81 cartes a 4 caractéristiques :
+    <ul>
+        <li>Le Nombre (1,2 ou 3)</li>
+        <li>La Couleur (rouge, vert ou bleu)</li>
+        <li>La Forme (losange, ovale ou croix)</li>
+        <li>Le Remplissage (vide, hachuré ou plein)</li>
+    </ul>
+
+    3 cartes forment un TRIO si chacune des caractéristiques sont, soit <b>totalement différentes</b>, soit <b>totalement
+    identiques</b>.
+    </p>
+
+    <h2>Exemples de Trios valides</h2>
+
+    <h3>Exemple 1</h3>
+
+    <div class="miniboard">
+        <div id="slot_0" class="card"><div class="symbol number1 fill1 shape1 color1"></div></div>
+        <div id="slot_3" class="card"><div class="symbol number1 fill2 shape2 color2"></div></div>
+        <div id="slot_6" class="card"><div class="symbol number1 fill3 shape3 color3"></div></div>
+    </div>
+
+    <ul>
+        <li>Les nombres sont tous identiques (1)</li>
+        <li>Les couleurs sont toutes différentes (rouge, vert et bleu)</li>
+        <li>Les formes sont toutes différentes (losange, ovale et croix)</li>
+        <li>Les remplissages sont tous différents (vide, hachuré et plein)</li>
+    </ul>
+
+    <h3>Exemple 2</h3>
+
+    <div class="miniboard">
+        <div id="slot_0" class="card"><div class="symbol number1 fill2 shape1 color1"></div></div>
+        <div id="slot_3" class="card"><div class="symbol number2 fill2 shape1 color2"></div></div>
+        <div id="slot_6" class="card"><div class="symbol number3 fill2 shape1 color3"></div></div>
+    </div>
+
+    <ul>
+        <li>Les nombres sont tous différents (1,2 et 3)</li>
+        <li>Les couleurs sont toutes différentes (rouge, vert et bleu)</li>
+        <li>Les formes sont toutes identiques (losange)</li>
+        <li>Les remplissages sont tous identiques (hachuré)</li>
+    </ul>
+
+    <h3>Exemple 3</h3>
+
+    <div class="miniboard">
+        <div id="slot_0" class="card"><div class="symbol number1 fill3 shape2 color2"></div></div>
+        <div id="slot_3" class="card"><div class="symbol number2 fill3 shape2 color2"></div></div>
+        <div id="slot_6" class="card"><div class="symbol number3 fill3 shape2 color2"></div></div>
+    </div>
+
+    <ul>
+        <li>Les nombres sont tous différents (1,2 et 3)</li>
+        <li>Les couleurs sont toutes identiques (rouge)</li>
+        <li>Les formes sont toutes identiques (croix)</li>
+        <li>Les remplissages sont tous identiques (plein)</li>
+    </ul>
+
+    <h2>Exemples de Trios invalides</h2>
+
+    <h3>Exemple 1</h3>
+
+    <div class="miniboard">
+        <div id="slot_0" class="card"><div class="symbol number3 fill1 shape1 color1"></div></div>
+        <div id="slot_3" class="card"><div class="symbol number3 fill2 shape2 color3"></div></div>
+        <div id="slot_6" class="card"><div class="symbol number3 fill3 shape3 color3"></div></div>
+    </div>
+
+    <ul>
+        <li>Les nombres sont tous identiques (3)</li>
+        <li>Les formes sont toutes différentes (losange, ovale et croix)</li>
+        <li>Les remplissages sont tous différents (vide, hachuré et plein)</li>
+        <li>Mais les couleurs ne sont, <b>ni toutes différentes, ni toutes identiques</b> (vert et bleu, pas de rouge)</li>
+    </ul>
+
+    <h3>Exemple 2</h3>
+
+    <div class="miniboard">
+        <div id="slot_0" class="card"><div class="symbol number1 fill2 shape1 color1"></div></div>
+        <div id="slot_3" class="card"><div class="symbol number1 fill2 shape2 color2"></div></div>
+        <div id="slot_6" class="card"><div class="symbol number2 fill2 shape3 color3"></div></div>
+    </div>
+
+    <ul>
+        <li>Les couleurs sont toutes différentes (rouge, vert et bleu)</li>
+        <li>Les formes sont toutes différentes (rectangle, ovale et vague)</li>
+        <li>Les remplissages sont tous identiques (hachuré)</li>
+        <li>Mais les nombres ne sont, <b>ni tous différents, ni tous identiques</b> (1 et 2, pas de 3)</li>
+    </ul>
+
+    <h3>Exemple 3</h3>
+
+    <div class="miniboard">
+        <div id="slot_0" class="card"><div class="symbol number1 fill1 shape1 color1"></div></div>
+        <div id="slot_3" class="card"><div class="symbol number1 fill2 shape3 color1"></div></div>
+        <div id="slot_6" class="card"><div class="symbol number1 fill3 shape3 color1"></div></div>
+    </div>
+
+    <ul>
+        <li>Les nombres sont tous identiques (1)</li>
+        <li>Les couleurs sont toutes identiques (bleu)</li>
+        <li>Les remplissages sont tous différents (vide, hachuré et plein)</li>
+        <li>Mais les formes ne sont, <b>ni toutes différentes, ni toutes identiques</b> (losange et ovale, pas de croix)</li>
+    </ul>
+
+    <h2>Si aucun Trio n'est possible</h2>
+
+    <p>
+    Si aucun TRIO n'est possible à l'aide des 12 cartes présentes sur la table (ou que les joueurs n'en trouvent aucun)
+    on peut ajouter 3 cartes supplémentaires, il y a alors 15 cartes sur la table, dans ce cas on ne les complétera pas
+    au TRIO suivant...
+    </p>
+
+    <h2>Gagner la partie</h2>
+    <p>
+    Le gagnant est celui qui à remporté le plus grand nombre de cartes...
+    </p>
+
+</div>
+
+</body>
+</html>
+

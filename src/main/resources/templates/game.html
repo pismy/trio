@@ -1,0 +1,42 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="layout">
+<head>
+	<title>Trio - Game</title>
+	<meta name="user_id" th:content="${userId}"/>
+	<meta name="game_id" th:content="${gameId}"/>
+	<link href="/resources/css/game.css" rel="stylesheet"/>
+	<script src="/webjars/sockjs-client/sockjs.min.js"></script>
+	<script src="/webjars/stomp-websocket/stomp.min.js"></script>
+	<script src="/resources/js/game.js"></script>
+</head>
+<body id="game">
+
+<div layout:fragment="content" class="container">
+
+	<div id="messages">
+		<div id="timer" class="hidden"></div>
+	</div>
+
+	<div id="controls">
+		<!-- can be: Wait (disable), Start, Trio, Cancel -->
+		<button id="action" class="hidden">...</button>
+
+		<div id="deck"></div>
+
+		<table id="scores">
+			<caption>Scores</caption>
+			<tbody class="headers">
+				<tr><th class="status">Status</th><th class="player">Joueur</th><th class="score">Score</th></tr>
+			</tbody>
+			<tbody class="players">
+			</tbody>
+		</table>
+	</div>
+
+	<div id="board">
+	</div>
+</div>
+</body>
+</html>
+

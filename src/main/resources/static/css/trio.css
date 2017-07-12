@@ -1,0 +1,68 @@
+body {
+    font-family: Arial;
+    margin: 0;
+    padding: 0;
+    background-color: #d6debd;
+    color: #404040;
+    font-size: medium;
+}
+
+table {
+    border-collapse: collapse;
+    border: solid #404040;
+    border-width: 2px 0;
+}
+
+caption {
+    font-size: large;
+    font-weight: bold;
+}
+
+caption, th, td {
+    border-bottom: 1px solid #404040;
+    padding: 3px 5px;
+}
+
+/* ============================================================================ */
+/* === Bootstrap customizations
+/* ============================================================================ */
+.container {
+    background: url("alu_bg.gif");
+    border-style: solid;
+    border-width: 0 2px 0 2px;
+    border-color: white #737667 white white;
+    /*position: absolute;*/
+    /*top: 0;*/
+    /*left: 50%;*/
+    /*margin-left: -384px;*/
+    /*padding: 20px;*/
+    /*width: 768px;*/
+    /*height: 100%;*/
+}
+
+.navbar-default {
+    background-color: transparent;
+    border: none;
+    margin-bottom: 0;
+}
+/* footer (sticky) */
+html {
+    position: relative;
+    min-height: 100%;
+}
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 105px;
+}
+#footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: transparent;
+    margin-top: 0;
+    padding: 0;
+    /* set height for sticky */
+    height: 105px;
+    border: none;
+}
+

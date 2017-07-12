@@ -1,0 +1,35 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="layout">
+<head>
+	<title>Trio - Games</title>
+</head>
+<body>
+
+	<div layout:fragment="content" class="container">
+		<h1 th:text="#{games.title}">All games</h1>
+		<table class="table">
+			<thead>
+			<tr>
+				<th>Started</th>
+				<th>Owner</th>
+				<th>Players</th>
+				<th>Status</th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr th:each="game : ${games}">
+				<td><a th:href="@{/games/{id}(id=${game.id})}" th:text="${game.created}">created date</a></td>
+				<td><a class="user" th:href="@{/users/{id}(id=${game.owner.id})}" th:utext="#{user.link(${game.owner.id}, ${game.owner.name})}">user link</a></td>
+				<td th:text="${game.players.size()}"></td>
+				<td th:text="${game.state}"></td>
+			</tr>
+			</tbody>
+		</table>
+		<form th:if="${#httpServletRequest.userPrincipal}" name="form" method="POST" th:action="@{/games}" accept="text/html">
+			<input type="submit" value="new game" class="btn btn-info" />
+		</form>
+	</div>
+</body>
+</html>
+

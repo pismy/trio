@@ -1,0 +1,37 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="layout">
+<head>
+	<title>Trio</title>
+</head>
+<body>
+
+<div layout:fragment="content" class="container">
+
+<!-- not logged -->
+<div th:unless="${#httpServletRequest.userPrincipal}">
+	<h1 th:text="#{home.anonymous.title}">Hello guest!</h1>
+	<h2 th:text="#{home.subtitle}">What do you want to do now?</h2>
+	<ol>
+		<li><a th:href="@{/login}">Log-in with your account</a> or <a th:href="@{/signup}">create a new account</a>,</li>
+		<li><a th:href="@{/games}">See a game as a spectator</a>,</li>
+		<li><a th:href="@{/users}">See other Trio players</a>.</li>
+	</ol>
+</div>
+
+<!-- logged -->
+<div th:if="${#httpServletRequest.userPrincipal}">
+	<h1 th:text="#{home.user.title(${@currentUserService.currentUser.fullname})}">Hello XYZ!</h1>
+	<h2 th:text="#{home.subtitle}">What do you want to do now?</h2>
+	<ol>
+		<li><a th:href="@{/games}">Join a game</a>,</li>
+		<li><a th:href="@{/games}">Create a game</a>,</li>
+		<li><a th:href="@{/users}">See other Trio players</a>.</li>
+	</ol>
+</div>
+
+</div>
+
+</body>
+</html>
+

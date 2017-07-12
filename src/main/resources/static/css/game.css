@@ -1,0 +1,343 @@
+/* ============================================================================ */
+/* === Game screen
+/* ============================================================================ */
+#messages {
+    margin: 20px 0;
+    height: 30px;
+    line-height: 34px;
+    background-color: #d6debd;
+    border-radius: 15px;
+    border: solid 2px;
+    border-color: #737667 white white #737667;
+    font-size: 20px;
+    padding: 0 10px;
+    color: #737667;
+    position: relative;
+}
+
+#controls {
+    float: right;
+    width: 213px;
+    font-size: 12px;
+}
+
+#action {
+    height: 105px;
+    width: 105px;
+    line-height: 109px;
+    text-align: center;
+    border-radius: 75px;
+    background: url("alu_bg.gif");
+    border: solid 2px;
+    border-color: white #737667 #737667 white;
+    font-size: 40px;
+    outline: none;
+    color: #737667;
+    text-shadow: 2px 2px white;
+    float: left;
+    margin-top: 10px;
+}
+
+#action:hover {
+    color: #737667;
+    background: url("gold_bg.jpg");
+}
+
+#action:active {
+    border-color: #737667 white white #737667;
+    color: white;
+    text-shadow: 2px 2px #737667;
+}
+
+#scores {
+    margin-top: 150px;
+    width: 100%;
+}
+#scores th {
+    display: none;
+}
+#scores tr {
+    transition-property: background-color;
+    transition-duration: .3s;
+}
+#scores tr.waiting {
+    background-color: rgba(220, 20, 60, 0.2);
+}
+#scores tr.selecting {
+    background-color: rgba(255, 215, 0, 0.2);
+}
+#scores tr.selecting td.status {
+    background: url("icons/hand.png") no-repeat center center;
+}
+#scores .status {
+    padding: 0;
+    width: 30px;
+    min-width: 30px;
+    text-align: center;
+}
+#scores .player {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 143px;
+    max-width: 143px;
+    min-width: 143px;
+}
+#scores .score {
+    padding: 0;
+    width: 30px;
+    min-width: 30px;
+    text-align: center;
+}
+
+#scores .rank {
+    background-color: crimson;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 2px 8px;
+    font-size: 12px;
+}
+#deck {
+    /*background: url("cards/back.gif") no-repeat;*/
+    /*width: 86px;*/
+    /*height: 121px;*/
+    background: url("icons/deck.png") no-repeat;
+    width: 86px;
+    height: 111px;
+    font-size: 40px;
+    line-height: 111px;
+    text-align: center;
+    color: #666666;
+    float: right;
+}
+
+#timer {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+
+    height: 30px;
+    line-height: 30px;
+    font-size: 20px;
+    padding: 0 10px;
+    color: #9D0E12;
+}
+
+#board {
+    position: relative;
+    float: left;
+    width: 510px;
+    height: 410px;
+    background-color: #d6debd;
+    border-radius: 15px;
+    border: solid 2px;
+    border-color: #737667 white white #737667;
+    padding: 8px;
+    line-height: 0;
+    font-size: 0;
+}
+
+.miniboard {
+    position: relative;
+    width: 315px;
+    height: 140px;
+    background-color: #d6debd;
+    border-radius: 15px;
+    border: solid 2px;
+    border-color: #737667 white white #737667;
+    padding: 8px;
+    margin: 15px;
+    line-height: 0;
+    font-size: 0;
+}
+
+.slot {
+    display: inline-block;
+    background: url("cards/bg_no.gif") no-repeat center center;
+    width: 86px;
+    height: 121px;
+    margin: 8px;
+}
+
+.card {
+    width: 86px;
+    height: 120px;
+    background-color: white;
+    border-radius: 8px;
+    border: 6px solid #9C9C9C;
+    box-shadow: 3px 3px 8px 2px #A7A5A6;
+    position: absolute;
+    transition-property: top, left;
+    transition-duration: 0.3s;
+}
+
+#slot_0, #slot_3, #slot_6, #slot_9, #slot_12 {
+    top: 10px;
+}
+#slot_1, #slot_4, #slot_7, #slot_10, #slot_13 {
+    top: 144px;
+}
+#slot_2, #slot_5, #slot_8, #slot_11, #slot_14 {
+    top: 278px;
+}
+#slot_0, #slot_1, #slot_2 {
+    left: 18px;
+}
+#slot_3, #slot_4, #slot_5 {
+    left: 116px;
+}
+#slot_6, #slot_7, #slot_8 {
+    left: 214px;
+}
+#slot_9, #slot_10, #slot_11 {
+    left: 312px;
+}
+#slot_12, #slot_13, #slot_14 {
+    left: 410px;
+}
+
+#board.select .card:hover {
+    background-color: gold;
+    outline: none;
+}
+.card.selected {
+    border-color: crimson;
+}
+.card.blink {
+    animation-name: blinker;
+    animation-duration: 0.4s;
+    animation-iteration-count: 3;
+}
+@keyframes blinker {
+    0% {
+        border-color: #9C9C9C;
+    }
+    50% {
+        border-color: crimson;
+    }
+    100% {
+        border-color: #9C9C9C;
+    }
+}
+.card.highlight {
+    animation-name: highlight;
+    animation-duration: 0.6s;
+}
+@keyframes highlight {
+    0% {
+        border-color: crimson;
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    50% {
+        border-color: crimson;
+    }
+    100% {
+        border-color: #9C9C9C;
+    }
+}
+.symbol {
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    background: url("cards/symbol000.gif") top center repeat-y;
+}
+.symbol.number1 {
+    margin-top: -17px;
+    height: 34px;
+}
+.symbol.number2 {
+    margin-top: -34px;
+    height: 68px;
+}
+.symbol.number3 {
+    margin-top: -51px;
+    height: 103px;
+}
+.symbol.fill1.shape1.color1 {
+    background-image: url("cards/symbol000.gif");
+}
+.symbol.fill1.shape1.color2 {
+    background-image: url("cards/symbol001.gif");
+}
+.symbol.fill1.shape1.color3 {
+    background-image: url("cards/symbol002.gif");
+}
+.symbol.fill1.shape2.color1 {
+    background-image: url("cards/symbol010.gif");
+}
+.symbol.fill1.shape2.color2 {
+    background-image: url("cards/symbol011.gif");
+}
+.symbol.fill1.shape2.color3 {
+    background-image: url("cards/symbol012.gif");
+}
+.symbol.fill1.shape3.color1 {
+    background-image: url("cards/symbol020.gif");
+}
+.symbol.fill1.shape3.color2 {
+    background-image: url("cards/symbol021.gif");
+}
+.symbol.fill1.shape3.color3 {
+    background-image: url("cards/symbol022.gif");
+}
+
+.symbol.fill2.shape1.color1 {
+    background-image: url("cards/symbol100.gif");
+}
+.symbol.fill2.shape1.color2 {
+    background-image: url("cards/symbol101.gif");
+}
+.symbol.fill2.shape1.color3 {
+    background-image: url("cards/symbol102.gif");
+}
+.symbol.fill2.shape2.color1 {
+    background-image: url("cards/symbol110.gif");
+}
+.symbol.fill2.shape2.color2 {
+    background-image: url("cards/symbol111.gif");
+}
+.symbol.fill2.shape2.color3 {
+    background-image: url("cards/symbol112.gif");
+}
+.symbol.fill2.shape3.color1 {
+    background-image: url("cards/symbol120.gif");
+}
+.symbol.fill2.shape3.color2 {
+    background-image: url("cards/symbol121.gif");
+}
+.symbol.fill2.shape3.color3 {
+    background-image: url("cards/symbol122.gif");
+}
+
+
+.symbol.fill3.shape1.color1 {
+    background-image: url("cards/symbol200.gif");
+}
+.symbol.fill3.shape1.color2 {
+    background-image: url("cards/symbol201.gif");
+}
+.symbol.fill3.shape1.color3 {
+    background-image: url("cards/symbol202.gif");
+}
+.symbol.fill3.shape2.color1 {
+    background-image: url("cards/symbol210.gif");
+}
+.symbol.fill3.shape2.color2 {
+    background-image: url("cards/symbol211.gif");
+}
+.symbol.fill3.shape2.color3 {
+    background-image: url("cards/symbol212.gif");
+}
+.symbol.fill3.shape3.color1 {
+    background-image: url("cards/symbol220.gif");
+}
+.symbol.fill3.shape3.color2 {
+    background-image: url("cards/symbol221.gif");
+}
+.symbol.fill3.shape3.color3 {
+    background-image: url("cards/symbol222.gif");
+}

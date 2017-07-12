@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+	<title>Layout</title>
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<!-- default header name is X-CSRF-TOKEN -->
+	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+	<link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+	<link href="/resources/css/trio.css" rel="stylesheet"/>
+	<script src="/webjars/jquery/jquery.min.js"/>
+	<script src="/webjars/bootstrap/js/bootstrap.min.js"/>
+</head>
+<body>
+	<!-- header fragment with navigation bar -->
+	<header id="header" th:fragment="header">
+		<nav class="navbar navbar-default">
+		  <div class="container">
+		    <div class="navbar-header">
+		      <a class="navbar-brand" href="/"></a>
+		    </div>
+		    <div class="collapse navbar-collapse" id="navbar-collapse">
+		      <ul class="nav navbar-nav">
+	            <li><a href="/"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+				<li><a href="/games"><span class="glyphicon glyphicon-th"></span> Games</a></li>
+	            <li><a href="/users"><span class="glyphicon glyphicon-user"></span> Users</a></li>
+				<li><a href="/rules"><span class="glyphicon glyphicon-info-sign"></span> Rules</a></li>
+		      </ul>
+			  
+		      <ul class="nav navbar-nav navbar-right">
+			    <!-- not logged -->
+		        <li class="dropdown" th:unless="${#httpServletRequest.userPrincipal}">
+		          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span> not logged <span class="caret"></span></a>
+		          <ul class="dropdown-menu">
+				    <li><a th:href="@{/login}"><span class="glyphicon glyphicon-log-in"></span> log-in</a></li>
+		            <li><a th:href="@{/signup}"><span class="glyphicon glyphicon-check"></span> sign-up</a></li>
+		          </ul>
+		        </li>
+			    <!-- logged -->
+		        <li class="dropdown" th:if="${#httpServletRequest.userPrincipal}">
+		          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span> <span th:text="${#httpServletRequest.userPrincipal.name}">user name</span> <span class="caret"></span></a>
+		          <ul class="dropdown-menu">
+		            <li><a th:href="@{/logout}"><span class="glyphicon glyphicon-log-out"></span> log-out</a></li>
+		          </ul>
+		        </li>
+		      </ul>
+		    </div>
+		  </div>
+		</nav>
+	</header>
+	
+	<!-- page content -->
+	<div class="container" layout:fragment="content">Page content</div>
+
+</body>
+</html>

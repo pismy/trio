@@ -1,0 +1,63 @@
+# ===================================================================
+# COMMON SPRING BOOT PROPERTIES
+# see: https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+# ===================================================================
+
+# ----------------------------------------
+# CORE PROPERTIES
+# ----------------------------------------
+spring:
+  application:
+    name: trio
+  # INTERNATIONALIZATION
+  messages:
+    basename: messages/messages
+  mvc:
+    # Path pattern used for static resources.
+    static-path-pattern: /resources/**
+  # THYMELEAF
+  thymeleaf:
+    # allows Thymeleaf templates to be reloaded at dev time
+    cache: false
+  # JPA
+  jpa:
+    show-sql: false
+  # DATASOURCE
+  datasource:
+    platform: hsqldb
+  # DATA REST (RepositoryRestProperties)
+  data:
+    rest:
+      base-path: /api
+
+# ----------------------------------------
+# SERVER PROPERTIES
+# ----------------------------------------
+server:
+  port: ${PORT:8080}
+  error:
+    whitelabel:
+      enabled: false
+  session-timeout: 6000
+  tomcat:
+    basedir: target/tomcat
+
+
+# ----------------------------------------
+# SECURITY PROPERTIES
+# ----------------------------------------
+#security.user.name=user # login username
+#security.user.password=changeme
+#security.user.role=USER # role assigned to the user
+security:
+  require-ssl: true
+  enable-csrf: true
+  basic.enabled: false
+
+# ----------------------------------------
+# CUSTOM --- Trio
+# ----------------------------------------
+custom:
+  rememberMe:
+    key: trio
+    param: rememberMe

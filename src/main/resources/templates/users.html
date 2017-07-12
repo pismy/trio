@@ -1,0 +1,28 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="layout">
+<head>
+	<title>Trio - Users</title>
+</head>
+<body>
+	<div layout:fragment="content" class="container">
+		<h1 th:text="#{users.title}">All users</h1>
+		<table class="table">
+			<thead>
+				<tr>
+					<td th:switch="${direction.name()}">
+			            <a th:case="DESC" href="?dir=ASC"><span class="glyphicon glyphicon-sort-by-alphabet"></span> User</a>
+			            <a th:case="ASC" href="?dir=DESC"><span class="glyphicon glyphicon-sort-by-alphabet-alt"></span> User</a>
+					</td>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="other : ${users}">
+					<td><a class="user" th:classappend="${@usersService.isConnected(other.username)}? connected" th:href="@{/users/{user}(user=${other.username})}"  th:utext="#{user.link(${other.username}, ${other.fullname})}">user link</a></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>
+
