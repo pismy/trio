@@ -16,9 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * @author PiPo
@@ -47,7 +45,7 @@ public class Engine {
     // =====================================================
     // === Game Data
     // =====================================================
-    private Card[] deck;
+    private final Queue<Card> deck = new ArrayDeque<>(Game.TOTAL_NUMBER_OF_CARDS);
     private Timer selectionTimer;
 
     // =====================================================
@@ -312,27 +310,24 @@ public class Engine {
         game.setState(Game.State.playing);
         broadcast(Event.gameStateChanged(Game.State.playing));
 
-        // --- build deck
-        game.setCardsLeft(81);
-        deck = new Card[81];
-        int n = 0;
+        // --- build unshuffled deck
+        List<Card> unshuffled = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 for (int k = 0; k < 3; k++) {
                     for (int l = 0; l < 3; l++) {
-                        deck[n++] = new Card(i, j, k, l);
+                        unshuffled.add(new Card(i, j, k, l));
                     }
                 }
             }
         }
 
         // --- shuffle
-        for (int i = 0; i < deck.length; i++) {
-            int offset = (int) (Math.random() * deck.length);
-            int i2 = (i + offset) % deck.length;
-            Card c = deck[i];
-            deck[i] = deck[i2];
-            deck[i2] = c;
+        deck.clear();
+        Random random = new Random();
+        while(!unshuffled.isEmpty()) {
+            int idx = random.nextInt(unshuffled.size());
+            deck.add(unshuffled.remove(idx));
         }
 
         game.reset();
@@ -474,45 +469,43 @@ public class Engine {
     }
 
     // --- returns the number of drawn cards
-    private int drawCards(int iCards, Event.DrawReason reason, int iReplaceFromPos) {
-        if (iCards == 0 || game.getCardsLeft() == 0)
+    private int drawCards(int nbCards, Event.DrawReason reason, int replaceFromPos) {
+        if (nbCards == 0 || deck.isEmpty())
             return 0;
         int nbCardsBeforeDraw = game.getCardsLeft();
         Card[] cards = null;
-        int[] pos = new int[iCards];
-        if (iReplaceFromPos < 0) {
+        int[] pos = new int[nbCards];
+        if (replaceFromPos < 0) {
             // --- find free positions
-            Vector cardsList = new Vector();
+            List cardsList = new ArrayList();
             int nb = 0;
             for (int i = 0; i < game.getBoard().length; i++) {
                 if (game.getBoard()[i] == null) {
                     // --- draw a card
                     game.decrCardsLeft(1);
-                    game.getBoard()[i] = deck[game.getCardsLeft()];
-                    cardsList.addElement(deck[game.getCardsLeft()]);
+                    cardsList.add(game.getBoard()[i] = deck.remove());
                     pos[nb] = i;
                     nb++;
-                    if (nb == iCards || game.getCardsLeft() == 0)
+                    if (nb == nbCards || deck.isEmpty())
                         break;
                 }
             }
             // --- fire draw cards event
             cards = new Card[cardsList.size()];
-            cardsList.copyInto(cards);
-            if (cards.length != iCards) {
+            cards = (Card[]) cardsList.toArray(cards);
+            if (cards.length != nbCards) {
                 int[] newpos = new int[cards.length];
                 System.arraycopy(pos, 0, newpos, 0, cards.length);
                 pos = newpos;
             }
         } else {
             // --- replace positions
-            cards = new Card[iCards];
-            for (int i = 0; i < iCards; i++) {
+            cards = new Card[nbCards];
+            for (int i = 0; i < nbCards; i++) {
                 game.decrCardsLeft(1);
-                pos[i] = iReplaceFromPos;
-                game.getBoard()[iReplaceFromPos] = deck[game.getCardsLeft()];
-                cards[i] = deck[game.getCardsLeft()];
-                iReplaceFromPos++;
+                pos[i] = replaceFromPos;
+                cards[i] = game.getBoard()[replaceFromPos] = deck.remove();
+                replaceFromPos++;
             }
         }
 

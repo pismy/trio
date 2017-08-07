@@ -100,7 +100,7 @@ function handleEvent(msg) {
                     message("Game is finished!");
                     break;
             }
-            reloadGame();
+            reloadGame(event.state == "playing");
             break;
         case "player_joined":
             message("<b>"+event.player.name+"</b> joined");
@@ -132,14 +132,14 @@ function handleEvent(msg) {
             message("<b>"+event.player.name+"</b> gave up selecting a trio");
             handleGameEvent(event);
             if(userId == event.player.id) {
-                setAction("Trio!", "declare_trio");
+                stopTrioSelection("Trio!", "declare_trio");
             }
             break;
         case "select_nolonger":
             message("<b>"+event.player.name+"</b> no longer has a trio");
             handleGameEvent(event);
             if(userId == event.player.id) {
-                setAction("Trio!", "declare_trio");
+                stopTrioSelection("Trio!", "declare_trio");
             }
             break;
         case "select_success":
@@ -223,6 +223,10 @@ function selectCard(evt) {
     }
 }
 
+/**
+ * Action button click handler
+ * @param evt event
+ */
 function actionClicked(evt) {
     var action = $(evt.target).prop("action");
     if(action) {
@@ -269,7 +273,12 @@ function handleGameEvent(event) {
     // update score (if has changed)
     if(event.newScore != null) {
         game.scores[event.player.id] = event.newScore;
-        $("#player_"+event.player.id+" .score").text(event.newScore);
+        $("#player_"+event.player.id+" .score")
+            .text(event.newScore)
+            .one("webkitAnimationEnd oanimationend msAnimationEnd animationend", function() {
+                $(this).removeClass("highlight");
+            })
+            .addClass("highlight");
         sortPlayersByScore();
     }
 
@@ -334,7 +343,7 @@ function drawCards(event) {
             var card = $(createCard(pos, value));
             card
                 .one("webkitAnimationEnd oanimationend msAnimationEnd animationend", function() {
-                    card.removeClass("highlight");
+                    $(this).removeClass("highlight");
                     console.log("[END] "+event.reason+" draw event for card "+pos)
                     animationQueue.next();
                 })
@@ -393,7 +402,7 @@ function send(action) {
 /**
  * Complete game reload (JSON/REST)
  */
-function reloadGame() {
+function reloadGame(skipBoard) {
     $.get("/games/"+gameId, function( game, status ) {
         window.game = game;
         console.log( "Game (status "+status+"):", game);
@@ -494,12 +503,14 @@ function reloadGame() {
         sortPlayersByScore();
 
         // --- 3: board
-        var board = document.getElementById("board");
-        $(board).empty();
-        for(var i=0; i<game.board.length; i++) {
-            var card = game.board[i];
-            if(card != null) {
-                board.appendChild(createCard(i, card.value));
+        if(!skipBoard) {
+            var board = document.getElementById("board");
+            $(board).empty();
+            for (var i = 0; i < game.board.length; i++) {
+                var card = game.board[i];
+                if (card != null) {
+                    board.appendChild(createCard(i, card.value));
+                }
             }
         }
 

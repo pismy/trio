@@ -14,6 +14,8 @@ import java.util.*;
 @EqualsAndHashCode(of="id")
 public class Game {
 
+    public static final int TOTAL_NUMBER_OF_CARDS = 81;
+
     public enum State {
         preparing, playing, finished, over;
     }
@@ -25,7 +27,7 @@ public class Game {
     private Map<String, Player> players = new HashMap<>();
     private Map<String, Integer> scores = new HashMap<>();
     private Queue<String> queue = new ArrayDeque<>();
-    private int cardsLeft = 81;
+    private int cardsLeft = TOTAL_NUMBER_OF_CARDS;
     private Card[] board = new Card[15];
 
     /**
@@ -35,7 +37,7 @@ public class Game {
         state = State.preparing;
         scores = new HashMap<>();
         queue = new ArrayDeque<>();
-        cardsLeft = 81;
+        cardsLeft = TOTAL_NUMBER_OF_CARDS;
         board = new Card[15];
     }
 

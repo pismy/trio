@@ -89,6 +89,20 @@
     min-width: 30px;
     text-align: center;
 }
+.score.highlight {
+    animation-name: score-highlight;
+    animation-duration: 1.5s;
+}
+@keyframes score-highlight {
+    0% {
+        font-weight: bold;
+        color: black;
+    }
+    100% {
+        font-weight: bold;
+        color: black;
+    }
+}
 
 #scores .rank {
     background-color: crimson;
@@ -127,26 +141,25 @@
 #board {
     position: relative;
     float: left;
-    width: 510px;
+    width: 502px;
     height: 410px;
+    background-image: url("cards/bg_no.gif");
     background-color: #d6debd;
     border-radius: 15px;
     border: solid 2px;
     border-color: #737667 white white #737667;
-    padding: 8px;
     line-height: 0;
     font-size: 0;
 }
 
 .miniboard {
     position: relative;
-    width: 315px;
+    width: 308px;
     height: 140px;
     background-color: #d6debd;
     border-radius: 15px;
     border: solid 2px;
     border-color: #737667 white white #737667;
-    padding: 8px;
     margin: 15px;
     line-height: 0;
     font-size: 0;
@@ -182,19 +195,19 @@
     top: 278px;
 }
 #slot_0, #slot_1, #slot_2 {
-    left: 18px;
+    left: 10px;
 }
 #slot_3, #slot_4, #slot_5 {
-    left: 116px;
+    left: 108px;
 }
 #slot_6, #slot_7, #slot_8 {
-    left: 214px;
+    left: 206px;
 }
 #slot_9, #slot_10, #slot_11 {
-    left: 312px;
+    left: 304px;
 }
 #slot_12, #slot_13, #slot_14 {
-    left: 410px;
+    left: 402px;
 }
 
 #board.select .card:hover {
@@ -205,11 +218,11 @@
     border-color: crimson;
 }
 .card.blink {
-    animation-name: blinker;
+    animation-name: card-blinker;
     animation-duration: 0.4s;
     animation-iteration-count: 3;
 }
-@keyframes blinker {
+@keyframes card-blinker {
     0% {
         border-color: #9C9C9C;
     }
@@ -221,10 +234,10 @@
     }
 }
 .card.highlight {
-    animation-name: highlight;
+    animation-name: card-highlight;
     animation-duration: 0.6s;
 }
-@keyframes highlight {
+@keyframes card-highlight {
     0% {
         border-color: crimson;
         opacity: 0;
