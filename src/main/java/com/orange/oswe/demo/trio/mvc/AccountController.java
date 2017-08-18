@@ -8,18 +8,22 @@
 package com.orange.oswe.demo.trio.mvc;
 
 import com.orange.oswe.demo.trio.domain.User;
+import com.orange.oswe.demo.trio.game.actions.GameNotFound;
 import com.orange.oswe.demo.trio.repository.AuthorityRepository;
 import com.orange.oswe.demo.trio.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.ServletException;

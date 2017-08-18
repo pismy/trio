@@ -1,0 +1,16 @@
+#D4D8D1
+#A8A8A1
+#AA9A66
+#B74934
+#577492
+#67655D
+#332C2F
+
+
+bleu très clair: 90c6e2
+bleu clair: 238ec6
+bleu moyen: 1d76a5
+bleu foncé: 21688e
+
+gris bg: 323232
+gris clair: d0d0d0

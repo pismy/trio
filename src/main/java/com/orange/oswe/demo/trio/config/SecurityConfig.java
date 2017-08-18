@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configurers.GlobalAuthenticationConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -121,13 +122,18 @@ public class SecurityConfig {
 			.and()
 				// all requests are unauthorized (Trio can be explored are a guest)
 				.authorizeRequests()
+					// actuator endpoints need ADMIN role
 					.antMatchers("/manage", "/manage/**")
 						.hasRole("ADMIN")
+					// all POST requests on /games need to be authenticated (create, join, actions)
+					.antMatchers(HttpMethod.POST, "/games", "/games/**")
+						.authenticated()
+					// all the rest doesn't require any authentication
 					.anyRequest()
 						.permitAll()
 			.and()
 				.formLogin()
-					.loginPage("/")
+					.loginPage("/login")
 					.loginProcessingUrl("/login")
 					.permitAll()
 			.and()

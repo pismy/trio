@@ -1,10 +1,15 @@
 /* ============================================================================ */
 /* === Game screen
 /* ============================================================================ */
+#game .container.filled {
+    background: url("linen.png");
+    position: relative;
+    width: 750px;
+}
 #messages {
-    margin: 20px 0;
+    margin: 20px 0 10px 0;
     height: 30px;
-    line-height: 34px;
+    line-height: 28px;
     background-color: #d6debd;
     border-radius: 15px;
     border: solid 2px;
@@ -16,41 +21,59 @@
 }
 
 #controls {
-    float: right;
-    width: 213px;
+    position: absolute;
+    top: 70px;
+    bottom: 0;
+    right: 0;
+    left: 513px;
     font-size: 12px;
+    padding: 15px;
 }
-
 #action {
-    height: 105px;
-    width: 105px;
-    line-height: 109px;
-    text-align: center;
-    border-radius: 75px;
-    background: url("alu_bg.gif");
-    border: solid 2px;
-    border-color: white #737667 #737667 white;
-    font-size: 40px;
     outline: none;
-    color: #737667;
-    text-shadow: 2px 2px white;
     float: left;
-    margin-top: 10px;
+
+    margin: 0;
+    padding: 0;
+
+    display: inline-block;
+    height: 100px;
+    width: 100px;
+    /*line-height: 100px;*/
+    text-align: center;
+    font-size: 25px;
+    font-weight: 900;
+    border-radius: 50%;
+    border-width: 4px;
+    border-style: solid;
+    border-color: #666666;
+
+    color: #666666;
+    text-shadow: 1px 1px 2px #333333;
+
+    -webkit-transition: all .1s ease-in-out;
+    -o-transition: all .1s ease-in-out;
+    -moz-transition: all .1s ease-in-out;
+    transition: all .1s ease-in-out;
+
+    background-image: -webkit-linear-gradient(top, #f4f1ee, #fff);
+    background-image: linear-gradient(top, #f4f1ee, #fff);
+    box-shadow: 0px 8px 10px 0px rgba(0, 0, 0, .3), inset 0px 4px 1px 1px white, inset 0px -3px 1px 1px rgba(204,198,197,.5);
 }
 
-#action:hover {
-    color: #737667;
-    background: url("gold_bg.jpg");
+#action:hover, #action:focus {
+    border-color: #21688e;
+    color: #21688e;
 }
 
 #action:active {
-    border-color: #737667 white white #737667;
-    color: white;
-    text-shadow: 2px 2px #737667;
+    border-color: #90c6e2;
+    color: #90c6e2;
+    margin: 1px -1px -1px 1px;
 }
 
 #scores {
-    margin-top: 150px;
+    margin-top: 110px;
     width: 100%;
 }
 #scores th {
@@ -113,49 +136,42 @@
     font-size: 12px;
 }
 #deck {
-    /*background: url("cards/back.gif") no-repeat;*/
-    /*width: 86px;*/
-    /*height: 121px;*/
-    background: url("icons/deck.png") no-repeat;
-    width: 86px;
-    height: 111px;
-    font-size: 40px;
-    line-height: 111px;
+    background: url("cards/back2.png") no-repeat;
+    width: 60px;
+    height: 84px;
+    font-size: 30px;
+    line-height: 84px;
     text-align: center;
     color: #666666;
     float: right;
+    margin: 8px 15px 0 0;
+    text-shadow: 1px 1px 2px #333333;
 }
 
 #timer {
     position: absolute;
     top: 0px;
     right: 0px;
-
-    height: 30px;
-    line-height: 30px;
-    font-size: 20px;
     padding: 0 10px;
-    color: #9D0E12;
+    color: crimson;
+    font-weight: bold;
 }
 
 #board {
     position: relative;
-    float: left;
-    width: 502px;
-    height: 410px;
-    background-image: url("cards/bg_no.gif");
-    background-color: #d6debd;
-    border-radius: 15px;
-    border: solid 2px;
-    border-color: #737667 white white #737667;
+    display: inline-block;
+    width: 498px;
+    height: 406px;
+    background: url("cards/bg_no.gif") 4px 3px;
     line-height: 0;
     font-size: 0;
+    margin-bottom: 15px;
 }
 
 .miniboard {
     position: relative;
     width: 308px;
-    height: 140px;
+    height: 144px;
     background-color: #d6debd;
     border-radius: 15px;
     border: solid 2px;
@@ -179,7 +195,8 @@
     background-color: white;
     border-radius: 8px;
     border: 6px solid #9C9C9C;
-    box-shadow: 3px 3px 8px 2px #A7A5A6;
+/*    box-shadow: 3px 3px 8px 2px #A7A5A6;*/
+    box-shadow: 3px 3px 5px 0 #777;
     position: absolute;
     transition-property: top, left;
     transition-duration: 0.3s;

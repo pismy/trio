@@ -17,7 +17,28 @@ public class Game {
     public static final int TOTAL_NUMBER_OF_CARDS = 81;
 
     public enum State {
-        preparing, playing, finished, over;
+        /**
+         * initial game state
+         * players are authorized to join and leave until the owner changes to {@link #playing} state
+         */
+        preparing,
+        /**
+         * playing state
+         * players are authorized to send game actions
+         * lasts until there are no more cards in the deck and no more trio on the board
+         * then automatically moves to {@link #over} state
+         */
+        playing,
+        /**
+         * when the game has ended
+         * lasts until the owner moves to {@link #finished} state
+         */
+        over,
+        /**
+         * finished game state
+         * lasts until the owner moves to {@link #preparing} state
+         */
+        finished;
     }
 
     private final String id;

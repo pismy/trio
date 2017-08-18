@@ -1,0 +1,24 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout" layout:decorator="layout">
+<head>
+	<title>Game Not Found</title>
+	<meta http-equiv="refresh" content="10; url=/" />
+</head>
+<body>
+	<div layout:fragment="content" class="container">
+		<div id="lo-error-dialog" class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title">Game Not Found</h1>
+				</div>
+				<div class="modal-body">
+ 					<p>Sorry, this game does not exist anymore.</p>
+					<p>You will be redirected to home page soon.</p>
+				</div>
+				<div class="modal-footer">
+					<a class="btn btn-primary" th:href="@{/}">Continue</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

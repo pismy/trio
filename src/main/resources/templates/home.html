@@ -1,14 +1,76 @@
 <html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-	layout:decorator="layout">
+	  xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout" xmlns="http://www.w3.org/1999/html"
+	  layout:decorator="layout">
 <head>
-	<title>Trio</title>
+	<title>Welcome to Trio</title>
 </head>
 <body>
 
-<div layout:fragment="content" class="container">
+<div layout:fragment="content" class="container filled">
 
-<!-- not logged -->
+	<h1>Welcome to Trio</h1>
+
+	<h2>Your games</h2>
+	<!-- not logged: login to play -->
+	<div class="row" th:unless="${#httpServletRequest.userPrincipal}">
+		<div class="col-md-4 col-xs-12">
+			<a class="card-btn primary" th:href="@{/login}">
+				<h3 class="card-header"><span class="glyphicon glyphicon-th"></span> Login</h3>
+				<div class="card-body">Click to login</div>
+			</a>
+		</div>
+	</div>
+	<!-- logged: start new game or link to my game -->
+	<div class="row" th:if="${#httpServletRequest.userPrincipal}">
+		<div class="col-md-4 col-xs-12" th:unless="${mygame}">
+			<div class="card-btn primary">
+				<h3 class="card-header"><span class="glyphicon glyphicon-th"></span> New game</h3>
+				<div class="card-body">Click to start a new game</div>
+				<div class="card-footer">
+					<form name="form" method="POST" th:action="@{/games}" accept="text/html">
+						<input type="submit" value="create" class="btn btn-sm btn-info" />
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4 col-xs-12" th:if="${mygame}">
+			<a class="card-btn primary" th:href="@{/games/{id}(id=${mygame.id})}">
+				<h3 class="card-header" th:utext="#{game.owner(${mygame.owner.id}, ${mygame.owner.name})}">Game owner</h3>
+				<div class="card-body">
+					<span th:utext="#{game.state(${mygame.state})}"></span>
+					<span th:utext="#{game.players(${mygame.players.size()})}"></span>
+					<span th:utext="#{game.created(${ui.friendlyFormat(mygame.created)})}"></span>
+				</div>
+			</a>
+		</div>
+		<div class="col-md-4 col-xs-12" th:each="game : ${gamesiamin}">
+			<a class="card-btn" th:href="@{/games/{id}(id=${game.id})}">
+				<h3 class="card-header" th:utext="#{game.owner(${game.owner.id}, ${game.owner.name})}">Game owner</h3>
+				<div class="card-body">
+					<span th:utext="#{game.state(${game.state})}"></span>
+					<span th:utext="#{game.players(${game.players.size()})}"></span>
+					<span th:utext="#{game.created(${ui.friendlyFormat(game.created)})}"></span>
+				</div>
+			</a>
+		</div>
+	</div>
+
+	<h2>Other games</h2>
+	<div class="row">
+		<div class="col-md-4 col-xs-12" th:each="game : ${othergames}">
+			<a class="card-btn" th:href="@{/games/{id}(id=${game.id})}">
+				<h3 class="card-header" th:utext="#{game.owner(${game.owner.id}, ${game.owner.name})}">Game owner</h3>
+				<div class="card-body">
+					<span th:utext="#{game.state(${game.state})}"></span>
+					<span th:utext="#{game.players(${game.players.size()})}"></span>
+					<span th:utext="#{game.created(${ui.friendlyFormat(game.created)})}"></span>
+				</div>
+			</a>
+		</div>
+	</div>
+
+	<!-- not logged -->
+<!--
 <div th:unless="${#httpServletRequest.userPrincipal}">
 	<h1 th:text="#{home.anonymous.title}">Hello guest!</h1>
 	<h2 th:text="#{home.subtitle}">What do you want to do now?</h2>
@@ -18,20 +80,23 @@
 		<li><a th:href="@{/users}">See other Trio players</a>.</li>
 	</ol>
 </div>
+-->
 
 <!-- logged -->
-<div th:if="${#httpServletRequest.userPrincipal}">
-	<h1 th:text="#{home.user.title(${@currentUserService.currentUser.fullname})}">Hello XYZ!</h1>
-	<h2 th:text="#{home.subtitle}">What do you want to do now?</h2>
-	<ol>
-		<li><a th:href="@{/games}">Join a game</a>,</li>
-		<li><a th:href="@{/games}">Create a game</a>,</li>
-		<li><a th:href="@{/users}">See other Trio players</a>.</li>
-	</ol>
-</div>
+	<!--
+    <div th:if="${#httpServletRequest.userPrincipal}">
+        <h1 th:text="#{home.user.title(${@currentUserService.currentUser.fullname})}">Hello XYZ!</h1>
+        <h2 th:text="#{home.subtitle}">What do you want to do now?</h2>
+        <ol>
+            <li><a th:href="@{/games}">Join a game</a>,</li>
+            <li><a th:href="@{/games}">Create a game</a>,</li>
+            <li><a th:href="@{/users}">See other Trio players</a>.</li>
+        </ol>
+    </div>
+    -->
 
-</div>
+    </div>
 
-</body>
-</html>
+    </body>
+    </html>
 

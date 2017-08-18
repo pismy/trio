@@ -6,7 +6,7 @@
 </head>
 <body>
 
-	<div layout:fragment="content" class="container">
+	<div layout:fragment="content" class="container filled">
 		<h1 th:text="#{login.title}">Login to your account</h1>
 		<div class="row">
 			<div class="col-lg-4">
@@ -23,37 +23,41 @@
 				</div>
 				<div role="alert" th:if="${param.logout}" class="alert alert-info">
 					<span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-					You have been logged out</div>
+					You have been logged out
+				</div>
 				<div role="alert" th:if="${param.error}" class="alert alert-danger">
 					<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
 					There was an error, please try again.
 				</div>
-				
+
+				<!-- login/email -->
 				<div class="form-group">
-					<!-- login/email -->
 					<div class="input-group">
 						<span class="input-group-addon" aria-hidden="true"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></span>
 						<label class="sr-only" for="username">Login</label>
 						<input id="username" class="form-control" name="username" placeholder="Login" />
-						<span class="input-group-addon" aria-hidden="true"><span class="glyphicon glyphicon-info-sign" aria-hidden="true" th:title="#{login.login.tip}"></span></span>
 					</div>
-					
-					<!-- password -->
+				</div>
+
+				<!-- password -->
+				<div class="form-group">
 					<div class="input-group">
 						<span class="input-group-addon" aria-hidden="true"><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></span>
 						<label class="sr-only" for="password">Password</label>
 						<input id="password" class="form-control" name="password" type="password" placeholder="Password" />
-						<span class="input-group-addon" aria-hidden="true"><span class="glyphicon glyphicon-info-sign" aria-hidden="true" th:title="#{login.password.tip}"></span></span>
 					</div>
-					
-					<!-- remember me -->
+				</div>
+
+				<!-- remember me -->
+				<div class="form-group">
 					<div class="input-group">
 						<label><input type="checkbox" name="rememberMe"/> <span>remember me</span></label> 
 					</div>
 				</div>
+
+				<!-- submit -->
 				<div class="form-group">
-					<!-- submit -->
-					<button type="submit" class="btn btn-primary btn-block">Login</button>
+					<button type="submit" class="btn btn-primary">Login</button>
 				</div>
 			</form>
 			</div>

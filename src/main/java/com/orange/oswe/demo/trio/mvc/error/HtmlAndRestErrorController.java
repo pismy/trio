@@ -10,15 +10,14 @@ package com.orange.oswe.demo.trio.mvc.error;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.web.ErrorController;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.RequestDispatcher;
@@ -34,8 +33,8 @@ import java.util.stream.Collectors;
  */
 @Controller
 @RequestMapping(HtmlAndRestErrorController.PATH)
-@Order(Ordered.HIGHEST_PRECEDENCE)
-public class HtmlAndRestErrorController implements ErrorController, HandlerExceptionResolver, Ordered {
+@ControllerAdvice
+public class HtmlAndRestErrorController implements ErrorController {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -138,16 +137,11 @@ public class HtmlAndRestErrorController implements ErrorController, HandlerExcep
 		logger.error("Internal error occurred in request '{} {}'", request.getMethod(), reqUrl, throwable);
 	}
 
-	@Override
-	public int getOrder() {
-		return Ordered.HIGHEST_PRECEDENCE;
-	}
-
 	/*
 	 * HandlerExceptionResolver impl: stores the exception in the request for later use, and forwards to this error controller
 	 */
-	@Override
-	public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+	@ExceptionHandler(Exception.class)
+	public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Exception ex) {
 		// stores the exception in the request attributes
 		request.setAttribute(ERROR_ATTRIBUTE, ex);
 		// forward to this

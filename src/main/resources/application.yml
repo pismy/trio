@@ -22,9 +22,15 @@ spring:
   # JPA
   jpa:
     show-sql: false
+    hibernate:
+      ddl-auto: update
   # DATASOURCE
   datasource:
     platform: hsqldb
+    url: jdbc:hsqldb:file:~/triodb;shutdown=true;hsqldb.write_delay=false
+    username: SA
+    password:
+    driver-class-name: org.hsqldb.jdbc.JDBCDriver
   # DATA REST (RepositoryRestProperties)
   data:
     rest:

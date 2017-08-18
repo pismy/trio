@@ -387,7 +387,7 @@ function send(action) {
         method: "POST",
         url: "/games/"+gameId+"/actions",
         headers: {
-            "X-CSRF-TOKEN": window.csrf
+            "X-CSRF-TOKEN": csrf
         },
         // The key needs to match your method's input parameter (case-sensitive).
         data: JSON.stringify(action),
@@ -526,6 +526,15 @@ function sortPlayersByScore() {
     }).appendTo($scores);
 }
 
+var ATTR_COLOR = 0;
+var ATTR_SHAPE = 2;
+var ATTR_FILL = 4;
+var ATTR_NUMBER = 6;
+
+function getCardAttribute(value, attr) {
+    return (value >> attr) & 0x3;
+}
+
 function createCard(position, value) {
     var card = document.createElement("div");
     card.className = "card";
@@ -533,10 +542,11 @@ function createCard(position, value) {
 
     var symbol = document.createElement("div");
     symbol.className = "symbol"
-        +" color"+((value & 0x3) + 1)
-        +" shape"+(((value >> 2) & 0x3) + 1)
-        +" fill"+(((value >> 4) & 0x3) + 1)
-        +" number"+(((value >> 6) & 0x3) + 1)
+        +" color"+(getCardAttribute(value, ATTR_COLOR) + 1)
+        +" shape"+(getCardAttribute(value, ATTR_SHAPE) + 1)
+        +" fill"+(getCardAttribute(value, ATTR_FILL) + 1)
+        +" number"+(getCardAttribute(value, ATTR_NUMBER) + 1)
+    symbol.id = "card_"+value;
     card.appendChild(symbol);
 
     return card;
@@ -552,4 +562,3 @@ $(function () {
     reloadGame();
     connect();
 });
-

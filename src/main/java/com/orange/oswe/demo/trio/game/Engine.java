@@ -58,8 +58,9 @@ public class Engine {
             throw new IllegalGameState("You cannot join a game that has already started.");
         }
         if (game.getPlayers().containsKey(player.getId())) {
-            LOGGER.error("User {} tries to join a game he is already part of. Reject.", player);
-            throw new IllegalGameState("You are already part of this game.");
+            LOGGER.warn("User {} tries to join a game he is already part of. Ignore.", player);
+//            throw new IllegalGameState("You are already part of this game.");
+            return;
         }
         game.addPlayer(player);
         // --- broadcast "node joins" message to all participating nodes
@@ -69,8 +70,9 @@ public class Engine {
     private void playerLeaves(Player player) throws IllegalGameState {
         LOGGER.info("User {} leaves", player);
         if (!game.getPlayers().containsKey(player.getId())) {
-            LOGGER.error("User {} tries to quit a game he is not part of. Reject.", player);
-            throw new IllegalGameState("You are not part of this game.");
+            LOGGER.warn("User {} tries to quit a game he is not part of. Ignore.", player);
+//            throw new IllegalGameState("You are not part of this game.");
+            return;
         }
         // --- change player state
         game.getPlayers().remove(player);

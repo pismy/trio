@@ -46,19 +46,6 @@ public class GameController {
     // ================================================================================================================
     // === HTML pages
     // ================================================================================================================
-    @RequestMapping(method = RequestMethod.GET, produces = {MediaType.TEXT_HTML_VALUE, MediaType.APPLICATION_XHTML_XML_VALUE})
-    public ModelAndView viewAllGames() {
-        logger.debug("(HTML) view all games");
-        ModelAndView modelAndView = new ModelAndView("games");
-        modelAndView.addObject("games", getAllGames());
-
-        // me
-        User me = currentUser.getCurrentUser();
-        modelAndView.addObject("me", me);
-
-        return modelAndView;
-    }
-
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = {MediaType.TEXT_HTML_VALUE, MediaType.APPLICATION_XHTML_XML_VALUE})
     public ModelAndView viewGame(Authentication authentication, @PathVariable("id") String id) throws GameNotFound {
         logger.debug("(HTML) view game {}", id);
@@ -85,6 +72,12 @@ public class GameController {
         return new ModelAndView("redirect:/games/" + game.getId());
     }
 
+    @RequestMapping(value = "/{id}/players", method = RequestMethod.POST, produces = {MediaType.TEXT_HTML_VALUE, MediaType.APPLICATION_XHTML_XML_VALUE})
+    public ModelAndView joinGameAndRedirect(Authentication authentication, @PathVariable("id") String id) throws ActionException {
+        logger.debug("(HTML) join game");
+        handleGameAction(authentication, id, new Action(Action.Type.player_join));
+        return new ModelAndView("redirect:/games/" + id);
+    }
 
     // ================================================================================================================
     // === JSON REST endpoints
@@ -103,7 +96,6 @@ public class GameController {
         logger.debug("(API) get game {}", id);
         Optional<Engine> engine = gameRepository.findById(id);
         if (!engine.isPresent()) {
-            // TODO: redirect to page
             throw new GameNotFound("Game " + id + " not found");
         } else {
             return engine.get().getGame();
@@ -141,4 +133,12 @@ public class GameController {
             throw new Unauthorized("You must be authenticated to send game actions");
         }
     }
+
+    @ExceptionHandler(GameNotFound.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    protected ModelAndView handleGameNotFound() {
+        return new ModelAndView("game_not_found");
+    }
+
 }

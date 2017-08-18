@@ -13,7 +13,7 @@
 <body>
 	<!-- header fragment with navigation bar -->
 	<header id="header" th:fragment="header">
-		<nav class="navbar navbar-default">
+		<nav class="navbar navbar-inverse">
 		  <div class="container">
 		    <div class="navbar-header">
 		      <a class="navbar-brand" href="/"></a>
@@ -21,7 +21,6 @@
 		    <div class="collapse navbar-collapse" id="navbar-collapse">
 		      <ul class="nav navbar-nav">
 	            <li><a href="/"><span class="glyphicon glyphicon-home"></span> Home</a></li>
-				<li><a href="/games"><span class="glyphicon glyphicon-th"></span> Games</a></li>
 	            <li><a href="/users"><span class="glyphicon glyphicon-user"></span> Users</a></li>
 				<li><a href="/rules"><span class="glyphicon glyphicon-info-sign"></span> Rules</a></li>
 		      </ul>
@@ -29,7 +28,7 @@
 		      <ul class="nav navbar-nav navbar-right">
 			    <!-- not logged -->
 		        <li class="dropdown" th:unless="${#httpServletRequest.userPrincipal}">
-		          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span> not logged <span class="caret"></span></a>
+		          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span> anonymous <span class="caret"></span></a>
 		          <ul class="dropdown-menu">
 				    <li><a th:href="@{/login}"><span class="glyphicon glyphicon-log-in"></span> log-in</a></li>
 		            <li><a th:href="@{/signup}"><span class="glyphicon glyphicon-check"></span> sign-up</a></li>
