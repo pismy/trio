@@ -26,12 +26,21 @@ public class Engine {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final Game game;
+    private final Timer timer = new Timer();
+    private final long inactivityTimeoutDelay;
+    private final InactivityTimeoutListener inactivityTimeoutListener;
+    private SelectionTimeout selectionTimer;
+    private InactivityTimeout inactivityTimeout;
     private boolean trioFoundInQueue = false;
+    private final Queue<Card> deck = new ArrayDeque<>(Game.TOTAL_NUMBER_OF_CARDS);
 
-    public Engine(String id, User creator, SimpMessagingTemplate messagingTemplate) {
+    public Engine(String id, User creator, SimpMessagingTemplate messagingTemplate, long inactivityTimeout, InactivityTimeoutListener timeoutListener) {
         this.messagingTemplate = messagingTemplate;
         game = new Game(id, creator.getUsername());
         game.addPlayer(new Player(creator));
+        this.inactivityTimeoutDelay = inactivityTimeout;
+        this.inactivityTimeoutListener = timeoutListener;
+        rearmInactivityTimeout();
     }
 
     public Game getGame() {
@@ -41,12 +50,6 @@ public class Engine {
     private void broadcast(Event event) {
         messagingTemplate.convertAndSend("/down/games/" + game.getId(), event);
     }
-
-    // =====================================================
-    // === Game Data
-    // =====================================================
-    private final Queue<Card> deck = new ArrayDeque<>(Game.TOTAL_NUMBER_OF_CARDS);
-    private Timer selectionTimer;
 
     // =====================================================
     // === Connection Methods
@@ -82,14 +85,8 @@ public class Engine {
     }
 
     // =====================================================
-    // === General Methods
-    // =====================================================
-    // =====================================================
     // === Game Methods
     // =====================================================
-    /*
-	 * @see psc.apps.trio.interfaces.IGame#playerAnnoucesTrio(int)
-	 */
     private void playerDeclaresTrio(Player player) throws ActionException {
         checkPlaying(player);
         checkPlayer(player);
@@ -149,7 +146,7 @@ public class Engine {
             if (selectionTimer == null) {
                 LOGGER.warn("playerTimeoutsTrioSelection({}): timeout not set", player);
             } else {
-                selectionTimer.stop();
+                selectionTimer.cancel();
                 selectionTimer = null;
             }
 
@@ -182,7 +179,7 @@ public class Engine {
             if (selectionTimer == null) {
                 LOGGER.warn("playerGaveUpTrioSelection({}): timeout not set", player);
             } else {
-                selectionTimer.stop();
+                selectionTimer.cancel();
                 selectionTimer = null;
             }
 
@@ -216,7 +213,7 @@ public class Engine {
             if (selectionTimer == null) {
                 LOGGER.warn("playerWithdrawsTrioSelection({}): timeout not set", player);
             } else {
-                selectionTimer.stop();
+                selectionTimer.cancel();
                 selectionTimer = null;
             }
 
@@ -251,7 +248,7 @@ public class Engine {
             if (selectionTimer == null) {
                 LOGGER.warn("playerSelectsTrio({}): timeout not set", player);
             } else {
-                selectionTimer.stop();
+                selectionTimer.cancel();
                 selectionTimer = null;
             }
 
@@ -296,8 +293,8 @@ public class Engine {
             Player player = game.getPlayers().get(playerId);
             broadcast(Event.playerSelectsTrio(player, null, game.getQueue()));
             // --- start selection timeout
-            selectionTimer = new Timer(player, 5);
-            new Thread(selectionTimer).start();
+            selectionTimer = new SelectionTimeout(player);
+            timer.schedule(selectionTimer, 5000);
         }
     }
 
@@ -516,6 +513,7 @@ public class Engine {
     }
 
     public void handle(User user, Action action) throws ActionException {
+        rearmInactivityTimeout();
         Player player = new Player(user);
         switch (action.getType()) {
             case start_game:
@@ -531,7 +529,7 @@ public class Engine {
                 playerJoins(player);
                 break;
             case player_leave:
-                playerJoins(player);
+                playerLeaves(player);
                 break;
             case declare_trio:
                 playerDeclaresTrio(player);
@@ -550,44 +548,47 @@ public class Engine {
     }
 
     // ==================================================================
-    // === CountDown
+    // === selection timeout
     // ==================================================================
-    private class Timer implements Runnable {
-        private boolean stopped = false;
-        private int timeout;
+    private class SelectionTimeout extends TimerTask {
         private Player player;
 
-        public Timer(Player player, int timeout) {
+        public SelectionTimeout(Player player) {
             this.player = player;
-            this.timeout = timeout;
         }
 
         public void run() {
-            synchronized (this) {
-                try {
-                    this.wait(timeout * 1000);
-                } catch (Exception e) {
-                }
-            }
-            if (!stopped) {
-                // --- timeout reached
-                LOGGER.warn("Timer: backup timeout reached for player {}.", player);
-                try {
-                    playerTimeoutsTrioSelection(player);
-                } catch (Exception e) {
-                    LOGGER.error("Error occurred while triggering selection timeout for {}", player, e);
-                }
-            }
-        }
-
-        public void stop() {
-            stopped = true;
-            synchronized (this) {
-                try {
-                    this.notifyAll();
-                } catch (Exception e) {
-                }
+            LOGGER.warn("Selection timeout reached for player {}.", player);
+            try {
+                playerTimeoutsTrioSelection(player);
+            } catch (Exception e) {
+                LOGGER.error("Error occurred while triggering selection timeout for {}", player, e);
             }
         }
     }
+
+    // ==================================================================
+    // === inactivity timeout
+    // ==================================================================
+    public interface InactivityTimeoutListener {
+        void onInactivityTimeout(Engine engine);
+    }
+
+    private void rearmInactivityTimeout() {
+        if(inactivityTimeout != null) {
+            inactivityTimeout.cancel();
+            inactivityTimeout = null;
+        }
+        // in 10 min
+        inactivityTimeout = new InactivityTimeout();
+        timer.schedule(inactivityTimeout, inactivityTimeoutDelay);
+    }
+
+    private class InactivityTimeout extends TimerTask {
+        public void run() {
+            LOGGER.warn("Inactivity timeout reached for game {}.", game.getId());
+            inactivityTimeoutListener.onInactivityTimeout(Engine.this);
+        }
+    }
+
 }

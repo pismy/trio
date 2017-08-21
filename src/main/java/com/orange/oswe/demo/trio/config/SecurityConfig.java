@@ -59,8 +59,8 @@ public class SecurityConfig {
 
 	@Bean
 	@Autowired
-	public RememberMeServices rememberMeServices(UserDetailsService userDetailsService, @Value("${custom.rememberMe.key}") String rememberMeKey,
-                                                 @Value("${custom.rememberMe.param}") String rememberMeParameter) {
+	public RememberMeServices rememberMeServices(UserDetailsService userDetailsService, @Value("${trio.rememberMe.key}") String rememberMeKey,
+                                                 @Value("${trio.rememberMe.param}") String rememberMeParameter) {
 		TokenBasedRememberMeServices rememberMeServices = new TokenBasedRememberMeServices(rememberMeKey, userDetailsService);
 		rememberMeServices.setParameter(rememberMeParameter);
 		return rememberMeServices;
@@ -97,7 +97,7 @@ public class SecurityConfig {
 	@Configuration
 	@Order(1)
 	public static class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
-		@Value("${custom.rememberMe.key}")
+		@Value("${trio.rememberMe.key}")
 		private String rememberMeKey;
 
 		@Autowired
