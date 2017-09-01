@@ -21,6 +21,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.authentication.RememberMeServices;
@@ -47,6 +48,11 @@ public class SecurityConfig {
 	private static final String AUTHORITIES_BY_USERNAME = "select username, authority from user_authorities "
 			+ "inner join users on user_authorities.user_id = users.id "
 			+ "inner join authorities on user_authorities.authority_id = authorities.id " + "where username = ?";
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
 	@Bean
 	@Autowired
