@@ -24,6 +24,7 @@ import java.util.*;
 public class Engine {
     public static final Logger LOGGER = LoggerFactory.getLogger(Engine.class);
 
+    private final Shuffler shuffler;
     private final SimpMessagingTemplate messagingTemplate;
     private final Game game;
     private final Timer timer = new Timer();
@@ -32,12 +33,13 @@ public class Engine {
     private SelectionTimeout selectionTimer;
     private InactivityTimeout inactivityTimeout;
     private boolean trioFoundInQueue = false;
-    private final Queue<Card> deck = new ArrayDeque<>(Game.TOTAL_NUMBER_OF_CARDS);
+    private Queue<Card> deck;
 
-    public Engine(String id, User creator, SimpMessagingTemplate messagingTemplate, long inactivityTimeout, InactivityTimeoutListener timeoutListener) {
+    public Engine(String id, User creator, Shuffler shuffler, SimpMessagingTemplate messagingTemplate, long inactivityTimeout, InactivityTimeoutListener timeoutListener) {
+        this.shuffler = shuffler;
         this.messagingTemplate = messagingTemplate;
         game = new Game(id, creator.getUsername());
-        game.addPlayer(new Player(creator));
+        game.add(new Player(creator));
         this.inactivityTimeoutDelay = inactivityTimeout;
         this.inactivityTimeoutListener = timeoutListener;
         rearmInactivityTimeout();
@@ -48,6 +50,7 @@ public class Engine {
     }
 
     private void broadcast(Event event) {
+        LOGGER.info(">>> {}", event);
         messagingTemplate.convertAndSend("/down/games/" + game.getId(), event);
     }
 
@@ -65,7 +68,7 @@ public class Engine {
 //            throw new IllegalGameState("You are already part of this game.");
             return;
         }
-        game.addPlayer(player);
+        game.add(player);
         // --- broadcast "node joins" message to all participating nodes
         broadcast(Event.playerJoined(player));
     }
@@ -78,7 +81,7 @@ public class Engine {
             return;
         }
         // --- change player state
-        game.getPlayers().remove(player);
+        game.remove(player);
 
         // --- broadcast event
         broadcast(Event.playerLeft(player));
@@ -260,8 +263,8 @@ public class Engine {
                 LOGGER.error("playerSelectsTrio({}): at least one position not occupied.", player);
                 throw new IllegalGameState("You've selected a non occupied slot.");
             }
-            Card.Attribute wrongAttribute = Card.isTrio(card1, card2, card3);
-            if (wrongAttribute == null) {
+            List<Card.Attribute> faulty = Card.isTrio(card1, card2, card3);
+            if (faulty.isEmpty()) {
                 LOGGER.info("playerSelectsTrio({}): valid trio", player);
                 // --- this is a trio: remove the cards and refill playing ground
                 game.getBoard()[cardPositions[0]] = null;
@@ -271,10 +274,19 @@ public class Engine {
                 // --- update player score and broadcast event
                 broadcast(Event.trioSelectionSuccess(player, cardPositions, game.incrScore(player.getId(), 3), game.getQueue()));
                 trioFoundInQueue = true;
+                // wait 1.5s for the trio found animation to occur before advancing the selection queue...
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        // --- process selection queue
+                        advanceSelectionQueue();
+                    }
+                }, 1600);
+                return;
             } else {
-                LOGGER.info("playerSelectsTrio({}): not a trio on attribute {}", player, wrongAttribute);
+                LOGGER.info("playerSelectsTrio({}): not a trio on attributes {}", player, faulty);
                 // --- update player score and broadcast event
-                broadcast(Event.trioSelectionFailure(player, game.incrScore(player.getId(), -1), game.getQueue()));
+                broadcast(Event.trioSelectionFailure(player, faulty, game.incrScore(player.getId(), -1), game.getQueue()));
             }
 
             // --- process selection queue
@@ -309,25 +321,7 @@ public class Engine {
         game.setState(Game.State.playing);
         broadcast(Event.gameStateChanged(Game.State.playing));
 
-        // --- build unshuffled deck
-        List<Card> unshuffled = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                for (int k = 0; k < 3; k++) {
-                    for (int l = 0; l < 3; l++) {
-                        unshuffled.add(new Card(i, j, k, l));
-                    }
-                }
-            }
-        }
-
-        // --- shuffle
-        deck.clear();
-        Random random = new Random();
-        while(!unshuffled.isEmpty()) {
-            int idx = random.nextInt(unshuffled.size());
-            deck.add(unshuffled.remove(idx));
-        }
+        deck = shuffler.shuffle();
 
         game.reset();
         game.setState(Game.State.playing);
@@ -337,28 +331,12 @@ public class Engine {
         refillBoard();
     }
 
-    private void playerEndsGame(Player player) throws ActionException {
+    private void playerRestartsGame(Player player) throws ActionException {
         checkOwner(player);
 
-        if (game.getState() != Game.State.playing) {
-            LOGGER.error("Trying to end a non playing game. Reject.", player);
-            throw new IllegalGameState("This game cannot be ended.");
-        }
-        if (!game.isOver()) {
-            LOGGER.error("Trying to finish a game while there are cards left. Reject.");
-            throw new IllegalGameState("You cannot finish a game while there are cards left.");
-        }
-
-        game.setState(Game.State.finished);
-        broadcast(Event.gameStateChanged(Game.State.finished));
-    }
-
-    private void playerPreparesGame(Player player) throws ActionException {
-        checkOwner(player);
-
-        if (game.getState() != Game.State.finished) {
-            LOGGER.error("Trying to prepare a non finished game. Reject.", player);
-            throw new IllegalGameState("This game cannot be prepared.");
+        if (game.getState() != Game.State.over) {
+            LOGGER.error("Trying to restart a non finished game. Reject.", player);
+            throw new IllegalGameState("This game cannot be restarted.");
         }
         game.reset();
 
@@ -366,20 +344,23 @@ public class Engine {
         broadcast(Event.gameStateChanged(Game.State.preparing));
     }
 
+    /**
+     * TODO: simplify?
+     */
     private void refillBoard() {
-        // --- count cards
-        int nbCards = 0;
+        // --- count cards, find free slot and slots to reorganize
+        int cardsOnBoard = 0;
         int nbReorg = 0;
         int[] posReorg = new int[3];
         int nbFree = 0;
         int[] posFree = new int[12];
-        for (int i = 0; i < game.getBoard().length; i++) {
+        for (int i = 0; i < Game.FULL_BOARD_SIZE; i++) {
             if (game.getBoard()[i] == null) {
-                if (i < game.getBoard().length - 3)
+                if (i < Game.NORMAL_BOARD_SIZE)
                     posFree[nbFree++] = i;
             } else {
-                nbCards++;
-                if (i >= game.getBoard().length - 3)
+                cardsOnBoard++;
+                if (i >= Game.NORMAL_BOARD_SIZE)
                     posReorg[nbReorg++] = i;
             }
         }
@@ -402,21 +383,20 @@ public class Engine {
         }
 
         // --- adds cards to have 12
-        if (nbCards < 12) {
-            drawCards(12 - nbCards, Event.DrawReason.refill, -1);
+        if (cardsOnBoard < Game.NORMAL_BOARD_SIZE) {
+            drawCards(Game.NORMAL_BOARD_SIZE - cardsOnBoard, Event.DrawReason.refill, -1);
         }
 
         // --- is there a trio?
         List<int[]> trios = findTrios(false);
         if (trios.isEmpty()) {
-            if (game.isOver()) {
-                // --- this is the end of the game
-                game.setState(Game.State.over);
-                broadcast(Event.gameStateChanged(Game.State.over));
+            if (!game.hasCardsLeft()) {
+                LOGGER.info("no trio on board and no more cards: end of game");
+                triggerEndOfGame();
                 return;
             }
             // --- draw 3 extra cards
-            LOGGER.info("GameEngine: no trio possible. Draw 3 more cards.");
+            LOGGER.info("no trio on board: draw 3 extra cards");
             drawCards(3, Event.DrawReason.extra, -1);
 
             // --- draw and replace cards until a Trio is found
@@ -426,36 +406,42 @@ public class Engine {
                 if (!trios.isEmpty()) {
                     break;
                 }
-                if (game.isOver()) {
-                    // --- this is the end of the game
-                    game.setState(Game.State.over);
-                    broadcast(Event.gameStateChanged(Game.State.over));
+                if (!game.hasCardsLeft()) {
+                    LOGGER.info("still no trio on board and no more cards: end of game");
+                    triggerEndOfGame();
                     return;
                 }
+                LOGGER.info("still no trio on board: replace 3 additional cards");
                 drawCards(3, Event.DrawReason.replaced, replaceFromPos);
                 replaceFromPos += 3;
             }
         }
     }
 
+    private void triggerEndOfGame() {
+        game.getQueue().clear();
+        game.setState(Game.State.over);
+        broadcast(Event.gameStateChanged(Game.State.over));
+    }
+
     private List<int[]> findTrios(boolean findAll) {
         List<int[]> trios = new ArrayList<>();
-        for (int i = 0; i < game.getBoard().length - 2; i++) {
+        for (int i = 0; i < Game.FULL_BOARD_SIZE - 2; i++) {
             Card c1 = game.getBoard()[i];
             if (c1 == null)
                 continue;
             // --- find trios with card i
-            for (int j = i + 1; j < game.getBoard().length - 1; j++) {
+            for (int j = i + 1; j < Game.FULL_BOARD_SIZE - 1; j++) {
                 Card c2 = game.getBoard()[j];
                 if (c2 == null)
                     continue;
                 // --- find trios with card i+j
-                for (int k = j + 1; k < game.getBoard().length; k++) {
+                for (int k = j + 1; k < Game.FULL_BOARD_SIZE; k++) {
                     Card c3 = game.getBoard()[k];
                     if (c3 == null)
                         continue;
                     // --- is i+j+k a trio?
-                    if (Card.isTrio(c1, c2, c3) == null) {
+                    if (Card.isTrio(c1, c2, c3).isEmpty()) {
                         trios.add(new int[]{i, j, k});
                         if (!findAll) {
                             return trios;
@@ -467,63 +453,64 @@ public class Engine {
         return trios;
     }
 
-    // --- returns the number of drawn cards
-    private int drawCards(int nbCards, Event.DrawReason reason, int replaceFromPos) {
-        if (nbCards == 0 || deck.isEmpty())
+    /**
+     * returns the number of drawn cards
+     */
+    // TODO: simplify?
+    private int drawCards(int cardsToDraw, Event.DrawReason reason, int replaceFromPos) {
+        if (cardsToDraw == 0 || deck.isEmpty())
             return 0;
-        int nbCardsBeforeDraw = game.getCardsLeft();
-        Card[] cards = null;
-        int[] pos = new int[nbCards];
+        int cardsLeftBeforeDraw = game.getCardsLeft();
+        Card[] drawnCards = null;
+        int[] pos = new int[cardsToDraw];
         if (replaceFromPos < 0) {
             // --- find free positions
-            List cardsList = new ArrayList();
-            int nb = 0;
-            for (int i = 0; i < game.getBoard().length; i++) {
+            List drawnCardsList = new ArrayList();
+            int cardsDrawn = 0;
+            for (int i = 0; i < Game.FULL_BOARD_SIZE; i++) {
                 if (game.getBoard()[i] == null) {
                     // --- draw a card
                     game.decrCardsLeft(1);
-                    cardsList.add(game.getBoard()[i] = deck.remove());
-                    pos[nb] = i;
-                    nb++;
-                    if (nb == nbCards || deck.isEmpty())
+                    drawnCardsList.add(game.getBoard()[i] = deck.remove());
+                    pos[cardsDrawn] = i;
+                    cardsDrawn++;
+                    if (cardsDrawn == cardsToDraw || deck.isEmpty())
                         break;
                 }
             }
             // --- fire draw cards event
-            cards = new Card[cardsList.size()];
-            cards = (Card[]) cardsList.toArray(cards);
-            if (cards.length != nbCards) {
-                int[] newpos = new int[cards.length];
-                System.arraycopy(pos, 0, newpos, 0, cards.length);
+            drawnCards = new Card[drawnCardsList.size()];
+            drawnCards = (Card[]) drawnCardsList.toArray(drawnCards);
+            if (drawnCards.length != cardsToDraw) {
+                int[] newpos = new int[drawnCards.length];
+                System.arraycopy(pos, 0, newpos, 0, drawnCards.length);
                 pos = newpos;
             }
         } else {
             // --- replace positions
-            cards = new Card[nbCards];
-            for (int i = 0; i < nbCards; i++) {
+            drawnCards = new Card[cardsToDraw];
+            for (int i = 0; i < cardsToDraw; i++) {
                 game.decrCardsLeft(1);
                 pos[i] = replaceFromPos;
-                cards[i] = game.getBoard()[replaceFromPos] = deck.remove();
+                drawnCards[i] = game.getBoard()[replaceFromPos] = deck.remove();
                 replaceFromPos++;
             }
         }
 
-        broadcast(Event.cardsDrawn(reason, nbCardsBeforeDraw, cards, pos));
-        return cards.length;
+        broadcast(Event.cardsDrawn(reason, cardsLeftBeforeDraw, drawnCards, pos));
+        return drawnCards.length;
     }
 
     public void handle(User user, Action action) throws ActionException {
+        LOGGER.info("<<< from {}: {}", user.getUsername(), action);
         rearmInactivityTimeout();
         Player player = new Player(user);
         switch (action.getType()) {
+            case restart_game:
+                playerRestartsGame(player);
+                break;
             case start_game:
                 playerStartsGame(player);
-                break;
-            case finish_game:
-                playerEndsGame(player);
-                break;
-            case prepare_game:
-                playerPreparesGame(player);
                 break;
             case player_join:
                 playerJoins(player);

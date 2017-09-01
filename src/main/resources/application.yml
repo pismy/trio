@@ -15,6 +15,7 @@ spring:
   mvc:
     # Path pattern used for static resources.
     static-path-pattern: /resources/**
+    throw-exception-if-no-handler-found: true
   # THYMELEAF
   thymeleaf:
     # allows Thymeleaf templates to be reloaded at dev time
@@ -23,11 +24,11 @@ spring:
   jpa:
     show-sql: false
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
   # DATASOURCE
   datasource:
     platform: hsqldb
-    url: jdbc:hsqldb:file:~/triodb # ;shutdown=true;hsqldb.write_delay=false
+    url: jdbc:hsqldb:file:~/trio-db # ;shutdown=true;hsqldb.write_delay=false
     username: SA
     password:
     driver-class-name: org.hsqldb.jdbc.JDBCDriver
@@ -35,7 +36,6 @@ spring:
   data:
     rest:
       base-path: /api
-
 # ----------------------------------------
 # SERVER PROPERTIES
 # ----------------------------------------

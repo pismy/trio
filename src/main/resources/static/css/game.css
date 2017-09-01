@@ -1,9 +1,10 @@
 /* ============================================================================ */
 /* === Game screen
 /* ============================================================================ */
-#game .container.filled {
+#game .container.page-body {
     position: relative;
     width: 750px;
+    z-index: 0;
 }
 #messages {
     margin: 20px 0 10px 0;
@@ -29,49 +30,63 @@
     padding: 15px;
 }
 #action {
-    outline: none;
     float: left;
-
-    margin: 0;
-    padding: 0;
-
-    display: inline-block;
+    display: block;
     height: 100px;
     width: 100px;
-    /*line-height: 100px;*/
+    position: relative;
+
+    outline: none;
+    text-decoration: none;
+
+    color: #999;
+    /*text-shadow: 0 1px 3px white, 0 -1px 3px #aaa;*/
     text-align: center;
+    line-height: 100px;
     font-size: 25px;
     font-weight: 900;
+
+    background-color: #ddd;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#f7f7f7), to(#e7e7e7));
+    background-image: -webkit-linear-gradient(top, #f7f7f7, #e7e7e7);
+    background-image: -moz-linear-gradient(top, #f7f7f7, #e7e7e7);
+    background-image: -ms-linear-gradient(top, #f7f7f7, #e7e7e7);
+    background-image: -o-linear-gradient(top, #f7f7f7, #e7e7e7);
+    border: none;
     border-radius: 50%;
-    border: 4px solid #666666;
-
-    color: #666666;
-    text-shadow: 1px 1px 2px #333333;
-
-    -webkit-transition: all .1s ease-in-out;
-    -o-transition: all .1s ease-in-out;
-    -moz-transition: all .1s ease-in-out;
-    transition: all .1s ease-in-out;
-
-    background-image: -webkit-linear-gradient(top, #f4f1ee, #fff);
-    background-image: linear-gradient(top, #f4f1ee, #fff);
-    box-shadow: 0px 8px 10px 0px rgba(0, 0, 0, .3), inset 0px 4px 1px 1px white, inset 0px -3px 1px 1px rgba(204,198,197,.5);
+    box-shadow: 0px 3px 8px #aaa, inset 0px 2px 3px #fff;
+}
+#action:before {
+    content: "";
+    display: block;
+    background: #fff;
+    border-top: 2px solid #ddd;
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    bottom: -10px;
+    right: -10px;
+    border-radius: 50%;
+    box-shadow: inset 0px 8px 48px #ddd;
+    z-index: -1;
 }
 
 #action:hover, #action:focus {
-    border-color: #21688e;
-    color: #21688e;
+    color: #666666;
+    background: #f5f5f5;
 }
 
 #action:active {
-    border-color: #90c6e2;
-    color: #90c6e2;
-    margin: 1px -1px -1px 1px;
+    color: #777;
 }
 
 #scores {
     margin-top: 110px;
     width: 100%;
+}
+#scores td {
+    font-size: 14px;
+    padding: 1px 5px;
 }
 #scores th {
     display: none;
@@ -88,6 +103,30 @@
 }
 #scores tr.selecting td.status {
     background: url("icons/hand.png") no-repeat center center;
+}
+#scores tr.winner td.status {
+    background: url("icons/winner.png") no-repeat center center;
+}
+#scores tr.winner {
+    -webkit-animation-duration: 1s;
+    -webkit-animation-name: glow;
+    -webkit-animation-direction: alternate;
+    -webkit-animation-iteration-count: infinite;
+    animation-duration: 1s;
+    animation-name: glow;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+    font-weight: bold;
+}
+@-webkit-keyframes glow {
+    from {
+        color: crimson;
+        background-color: transparent;
+    }
+    to {
+        color: black;
+        background-color: rgba(255, 215, 0, 0.2);
+    }
 }
 #scores .status {
     padding: 0;
@@ -112,14 +151,13 @@
 .score.highlight {
     animation-name: score-highlight;
     animation-duration: 1.5s;
+    font-weight: bold;
 }
 @keyframes score-highlight {
     0% {
-        font-weight: bold;
         color: black;
     }
     100% {
-        font-weight: bold;
         color: black;
     }
 }
@@ -233,7 +271,7 @@
 }
 .card.blink {
     animation-name: card-blinker;
-    animation-duration: 0.4s;
+    animation-duration: 0.5s;
     animation-iteration-count: 3;
 }
 @keyframes card-blinker {

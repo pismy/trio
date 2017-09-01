@@ -1,0 +1,5 @@
+- ajouter un délai (blink) pour le 2eme joueur à sélectionner
+- game state change "finish": do not reloadGame() (--> stops the last blink animation)
+- game status finish ?
+- destroy a game ?
+- game over: celebrate the winners !

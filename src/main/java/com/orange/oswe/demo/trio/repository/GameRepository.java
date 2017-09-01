@@ -2,6 +2,7 @@ package com.orange.oswe.demo.trio.repository;
 
 import com.orange.oswe.demo.trio.domain.User;
 import com.orange.oswe.demo.trio.game.Engine;
+import com.orange.oswe.demo.trio.game.Shuffler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -25,9 +26,11 @@ public class GameRepository {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
+    private final Shuffler shuffler = new Shuffler();
+
     public Engine createNew(User user) {
         String id = UUID.randomUUID().toString();
-        Engine engine = new Engine(id, user, messagingTemplate, inactivityTimeout, new EngineInactivityListener());
+        Engine engine = new Engine(id, user, shuffler, messagingTemplate, inactivityTimeout, new EngineInactivityListener());
         id2Game.put(id, engine);
         return engine;
     }

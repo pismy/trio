@@ -14,7 +14,18 @@ import java.util.*;
 @EqualsAndHashCode(of="id")
 public class Game {
 
+    /**
+     * Total number of cards in a deck
+     */
     public static final int TOTAL_NUMBER_OF_CARDS = 81;
+    /**
+     * Normal board size: number of cards usually displayed (if at least one trio is present)
+     */
+    public static final int NORMAL_BOARD_SIZE = 12;
+    /**
+     *Max board size: number of cars displayed in case no trio was present in the normal board
+     */
+    public static final int FULL_BOARD_SIZE = 15;
 
     public enum State {
         /**
@@ -31,14 +42,9 @@ public class Game {
         playing,
         /**
          * when the game has ended
-         * lasts until the owner moves to {@link #finished} state
-         */
-        over,
-        /**
-         * finished game state
          * lasts until the owner moves to {@link #preparing} state
          */
-        finished;
+        over;
     }
 
     private final String id;
@@ -49,7 +55,7 @@ public class Game {
     private Map<String, Integer> scores = new HashMap<>();
     private Queue<String> queue = new ArrayDeque<>();
     private int cardsLeft = TOTAL_NUMBER_OF_CARDS;
-    private Card[] board = new Card[15];
+    private Card[] board = new Card[FULL_BOARD_SIZE];
 
     /**
      * Resets this game to prepare a new match
@@ -59,7 +65,12 @@ public class Game {
         scores = new HashMap<>();
         queue = new ArrayDeque<>();
         cardsLeft = TOTAL_NUMBER_OF_CARDS;
-        board = new Card[15];
+        board = new Card[FULL_BOARD_SIZE];
+    }
+
+    @JsonIgnore
+    public boolean hasCardsLeft() {
+        return cardsLeft > 0;
     }
 
     @JsonIgnore
@@ -67,13 +78,12 @@ public class Game {
         return players.get(ownerId);
     }
 
-    @JsonIgnore
-    public boolean isOver() {
-        return cardsLeft <= 0;
+    public void add(Player player) {
+        players.put(player.getId(), player);
     }
 
-    public void addPlayer(Player player) {
-        players.put(player.getId(), player);
+    public void remove(Player player) {
+        players.remove(player.getId());
     }
 
     public int setScore(String playerId, int score) {

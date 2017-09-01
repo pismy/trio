@@ -88,7 +88,7 @@ function handleEvent(msg) {
         case "game_state_changed":
             switch(event.state) {
                 case "preparing":
-                    message("Let's begin a new game!");
+                    message("Let's play again!");
                     break;
                 case "playing":
                     message("Game starts!");
@@ -96,11 +96,8 @@ function handleEvent(msg) {
                 case "over":
                     message("Game is over!");
                     break;
-                case "finished":
-                    message("Game is finished!");
-                    break;
             }
-            reloadGame(event.state == "playing");
+            reloadGame(event.state != "preparing");
             break;
         case "player_joined":
             message("<b>"+event.player.name+"</b> joined");
@@ -151,7 +148,12 @@ function handleEvent(msg) {
             }
             break;
         case "select_failure":
-            message("<b>"+event.player.name+"</b> selected a wrong trio");
+            if(userId == event.player.id) {
+                // message with more explanations: faulty attributes
+                message("<b>" + event.player.name + "</b> selected a wrong trio (on <b>"+event.faulty.join(", ")+"</b>)");
+            } else {
+                message("<b>" + event.player.name + "</b> selected a wrong trio");
+            }
             handleGameEvent(event);
             if(userId == event.player.id) {
                 setAction("Trio!", "declare_trio");
@@ -447,18 +449,7 @@ function reloadGame(skipBoard) {
             case "over":
                 if(game.ownerId == userId) {
                     // owner
-                    setAction("Finish", "finish_game");
-                } else if(userId != null) {
-                    setAction("Wait", null);
-                } else {
-                    // anonymous
-                    setAction("Signin", null);
-                }
-                break;
-            case "finished":
-                if(game.ownerId == userId) {
-                    // owner
-                    setAction("Again", "prepare_game");
+                    setAction("Again", "restart_game");
                 } else if(userId != null) {
                     setAction("Wait", null);
                 } else {
@@ -471,22 +462,34 @@ function reloadGame(skipBoard) {
         // --- 2: players and scores
         var $scores = $("#scores .players");
         $scores.empty();
+        var maxScore = -1000;
         for(var playerId in game.players) {
+            maxScore = Math.max(maxScore, game.scores[playerId] | 0);
+        }
+        for(var playerId in game.players) {
+            var points = game.scores[playerId] | 0;
             var row = document.createElement("tr");
             row.id = "player_"+playerId;
             var status = document.createElement("td");
             status.className = "status";
             var selIdx = game.queue.indexOf(playerId);
-            if(selIdx == 0) {
-                // currently selecting
-                row.className = "selecting";
-            } else if(selIdx > 0) {
-                // in the selection queue
-                row.className = "waiting";
-                var rank = document.createElement("span");
-                rank.className = "rank";
-                rank.innerText = selIdx;
-                row.appendChild(rank);
+            if(game.state == "over") {
+                // mark winners
+                if(points == maxScore) {
+                    row.className = "winner";
+                }
+            } else {
+                if(selIdx == 0) {
+                    // currently selecting
+                    row.className = "selecting";
+                } else if(selIdx > 0) {
+                    // in the selection queue
+                    row.className = "waiting";
+                    var rank = document.createElement("span");
+                    rank.className = "rank";
+                    rank.innerText = selIdx;
+                    row.appendChild(rank);
+                }
             }
 
             var name = document.createElement("td");
@@ -494,12 +497,13 @@ function reloadGame(skipBoard) {
             name.innerText = game.players[playerId].name;
             var score = document.createElement("td");
             score.className = "score";
-            score.innerText = game.scores[playerId] | 0;
+            score.innerText = points;
             row.appendChild(status);
             row.appendChild(name);
             row.appendChild(score);
             $scores.append(row);
         }
+
         sortPlayersByScore();
 
         // --- 3: board
@@ -522,7 +526,7 @@ function reloadGame(skipBoard) {
 function sortPlayersByScore() {
     var $scores = $("#scores .players");
     $scores.find('tr').sort(function(row1, row2) {
-        return Number.parseInt($('.score', row2).text()) - Number.parseInt($('.score', row1).text());
+        return parseInt($('.score', row2).text(), 10) - parseInt($('.score', row1).text(), 10);
     }).appendTo($scores);
 }
 

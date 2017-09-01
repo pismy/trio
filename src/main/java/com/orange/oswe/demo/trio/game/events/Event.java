@@ -5,6 +5,7 @@ import com.orange.oswe.demo.trio.game.model.Game;
 import com.orange.oswe.demo.trio.game.model.Player;
 import lombok.Value;
 
+import java.util.List;
 import java.util.Queue;
 
 /**
@@ -34,7 +35,7 @@ public abstract class Event {
     public abstract Type getType();
 
     @Value
-    private static class GameStateChanged extends Event {
+    public static class GameStateChanged extends Event {
         private final Game.State state;
 
         @Override
@@ -44,13 +45,13 @@ public abstract class Event {
     }
 
     @Value
-    private static class PlayerEvent extends Event {
+    public static class PlayerEvent extends Event {
         private final Type type;
         private final Player player;
     }
 
     @Value
-    private static class GameEvent extends Event {
+    public static class GameEvent extends Event {
         private final Type type;
         private final Player player;
         private final Integer newScore;
@@ -58,7 +59,20 @@ public abstract class Event {
     }
 
     @Value
-    private static class TrioFoundEvent extends Event {
+    public static class TrioFailureEvent extends Event {
+        private final Player player;
+        private final List<Card.Attribute> faulty;
+        private final Integer newScore;
+        private final Queue<String> queue;
+
+        @Override
+        public Type getType() {
+            return Type.select_failure;
+        }
+    }
+
+    @Value
+    public static class TrioFoundEvent extends Event {
         private final Player player;
         private final int[] positions;
         private final Integer newScore;
@@ -71,7 +85,7 @@ public abstract class Event {
     }
 
     @Value
-    private static class CardsDrawnEvent extends Event {
+    public static class CardsDrawnEvent extends Event {
         private final DrawReason reason;
         private final int nbCardsBeforeDraw;
         private final Card[] cards;
@@ -84,7 +98,7 @@ public abstract class Event {
     }
 
     @Value
-    private static class CardsMovedEvent extends Event {
+    public static class CardsMovedEvent extends Event {
         private final int[] from;
         private final int[] to;
 
@@ -126,8 +140,8 @@ public abstract class Event {
         return new GameEvent(Type.select_nolonger, player, newScore, queue);
     }
 
-    public static Event trioSelectionFailure(Player player, Integer newScore, Queue<String> queue) {
-        return new GameEvent(Type.select_failure, player, newScore, queue);
+    public static Event trioSelectionFailure(Player player, List<Card.Attribute> faulty, Integer newScore, Queue<String> queue) {
+        return new TrioFailureEvent(player, faulty, newScore, queue);
     }
 
     public static Event trioSelectionSuccess(Player player, int[] positions, Integer newScore, Queue<String> queue) {

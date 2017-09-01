@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Action {
     public enum Type {
-        start_game, finish_game, prepare_game, declare_trio, select_trio, player_join, player_leave, cancel_trio
+        start_game, restart_game, declare_trio, select_trio, player_join, player_leave, cancel_trio
     }
     Type type;
     int[] selection;

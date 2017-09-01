@@ -3,6 +3,9 @@ package com.orange.oswe.demo.trio.game.model;
 import com.google.common.base.Preconditions;
 import lombok.Value;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by crhx7117 on 20/06/17.
  */
@@ -11,6 +14,10 @@ public class Card {
 
     public enum Attribute {
         color, shape, fill, number
+    }
+
+    public Card(int value) {
+        this.value = value;
     }
 
     public Card(int color, int shape, int fill, int number) {
@@ -33,28 +40,29 @@ public class Card {
     }
     /**
      * Determines whether the 3 given cards are a Trio
-     * @return {@code null} if they are a trio; first faulty attribute if not
+     * @return an empty list if they are a trio; list of faulty attributes if not
      */
-    public static Attribute isTrio(Card card1, Card card2, Card card3) {
+    public static List<Attribute> isTrio(Card card1, Card card2, Card card3) {
+        List<Attribute> faulty = new ArrayList<>();
         for (Card.Attribute attribute : Card.Attribute.values()) {
             if (card1.getAttribute(attribute) == card2.getAttribute(attribute)) {
                 // --- check they are all equal
                 if (card1.getAttribute(attribute) != card3.getAttribute(attribute)) {
                     // --- not a trio
-                    return attribute;
+                    faulty.add(attribute);
                 }
             } else {
                 // --- check they are all different
                 if (card1.getAttribute(attribute) == card3.getAttribute(attribute)) {
                     // --- not a trio
-                    return attribute;
+                    faulty.add(attribute);
                 } else if (card2.getAttribute(attribute) == card3.getAttribute(attribute)) {
                     // --- not a trio
-                    return attribute;
+                    faulty.add(attribute);
                 }
             }
         }
-        return null;
+        return faulty;
     }
 
 }

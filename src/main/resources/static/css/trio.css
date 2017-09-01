@@ -25,21 +25,6 @@ caption, th, td {
     border: none;
     box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
 }
-.container.filled {
-    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
-    background: url("images/white_linen.png");
-    /*background-color: white;*/
-}
-.container.filled h1 {
-    background-color: #323232;
-    color: #9d9d9d;
-    margin: 0 -15px 15px -15px;
-    padding: 0 15px;
-    line-height: 60px;
-    height: 60px;
-    font-size: 30px;
-    font-weight: normal;
-}
 /* footer (sticky) */
 html {
     position: relative;
@@ -99,6 +84,20 @@ body {
 /* ============================================================================ */
 /* === specific Trio styles
 /* ============================================================================ */
+.page-body {
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
+    background: url("images/white_linen.png");
+}
+.page-body h1 {
+    background-color: #323232;
+    color: #9d9d9d;
+    margin: 0 -15px 15px -15px;
+    padding: 0 15px;
+    line-height: 60px;
+    height: 60px;
+    font-size: 30px;
+    font-weight: normal;
+}
 .trio-login {
     font-size: smaller;
 }
