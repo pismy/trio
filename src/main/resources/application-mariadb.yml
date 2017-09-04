@@ -1,0 +1,19 @@
+# ===================================================================
+# Profile for MySql storage
+# ===================================================================
+spring:
+  # DATASOURCE
+  datasource: 
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: ${MYSQL_DATASOURCE_URL:jdbc:mysql://triodb:3306/trio?autoReconnect=true}
+    username: ${MYSQL_USER:userLRX}
+    password: ${MYSQL_PASSWORD:T46UanPNvYoJH814}
+  jpa:
+    hibernate:
+      naming:
+        strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+flyway:
+  placeholders: {"BIGINT_AUTO_INCREMENT": "BIGINT NOT NULL AUTO_INCREMENT"}
