@@ -29,7 +29,7 @@ public class GameRepository {
     private final Shuffler shuffler = new Shuffler();
 
     public Engine createNew(User user) {
-        String id = UUID.randomUUID().toString();
+        String id = Long.toHexString(System.nanoTime());
         Engine engine = new Engine(id, user, shuffler, messagingTemplate, inactivityTimeout, new EngineInactivityListener());
         id2Game.put(id, engine);
         return engine;
