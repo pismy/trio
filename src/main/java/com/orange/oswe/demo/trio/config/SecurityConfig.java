@@ -126,7 +126,6 @@ public class SecurityConfig {
 					.frameOptions()
 						.sameOrigin()
 			.and()
-				// all requests are unauthorized (Trio can be explored are a guest)
 				.authorizeRequests()
 					// actuator endpoints need ADMIN role
 					.antMatchers("/manage", "/manage/**")

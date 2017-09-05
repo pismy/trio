@@ -11,6 +11,7 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Action {
     public enum Type {
         start_game, restart_game, declare_trio, select_trio, player_join, player_leave, cancel_trio

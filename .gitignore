@@ -1,0 +1,7 @@
+.project
+*.md.html
+.classpath
+.settings/
+target/
+trio.iml
+.idea/

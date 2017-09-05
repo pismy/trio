@@ -8,17 +8,17 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h1 class="modal-title">
-						<span class="lo-http-code" th:text="${error.errorCode.status.value()}">Http Status Code</span>
+						<span class="lo-http-code" th:text="${code.status.value()}">Http Status Code</span>
 						<span class="lo-http-name" th:text="${niceHttpStatus}">Http Status Name</span>
 					</h1>
 				</div>
 				<div class="modal-body">
- 					<p th:utext="${#messages.msgOrNull('error.' + error.errorCode.name() + '.desc')} ?: ${description}">Error description</p>
+ 					<p th:utext="${#messages.msgOrNull('error.' + code.name() + '.desc')} ?: ${description}">Error description</p>
 				</div>
 				<div class="modal-footer">
 					<div id="details" class="collapse">
-						<div class="lo-error-code" th:text="'[' + ${error.errorCode.code} + '] ' + ${error.errorCode.name()}">[CODE] Name</div>
-						<pre class="lo-error-message" th:unless="${#strings.isEmpty(error.description)}" th:text="${error.description}">Error message</pre>
+						<div class="lo-error-code" th:text="'[' + ${code.code} + '] ' + ${code.name()}">[CODE] Name</div>
+						<pre class="lo-error-message" th:unless="${#strings.isEmpty(description)}" th:text="${description}">Error message</pre>
 					</div>
 					<a class="btn" href="#" data-toggle="collapse" data-target="#details">View details »</a>
 				</div>

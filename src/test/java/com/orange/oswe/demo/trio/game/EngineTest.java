@@ -44,7 +44,7 @@ public class EngineTest {
     @Test
     public void first_draw_with_trio_should_draw_12_cards() throws ActionException {
         // GIVEN
-        Mockito.when(shuffler.shuffle()).thenReturn(deckWithTrioInFirst12());
+        Mockito.when(shuffler.shuffle()).thenReturn(deckOf21WithTrioInFirst12());
 
         // WHEN
         engine.handle(CREATOR, new Action(Action.Type.start_game));
@@ -58,7 +58,7 @@ public class EngineTest {
     @Test
     public void deck_with_trio_at_19_should_draw_21_cards() throws ActionException {
         // GIVEN
-        Mockito.when(shuffler.shuffle()).thenReturn(deckWithFirstTrioAt19());
+        Mockito.when(shuffler.shuffle()).thenReturn(deckOf21WithFirstTrioAt19());
 
         // WHEN
         engine.handle(CREATOR, new Action(Action.Type.start_game));
@@ -74,12 +74,34 @@ public class EngineTest {
         Assert.assertEquals(Event.DrawReason.replaced, drawEventCaptor.getAllValues().get(3).getReason());
     }
 
-    private Queue<Card> deckWithTrioInFirst12() {
+    @Test
+    public void select_valid_trio_should_succeed() throws ActionException {
+        // GIVEN
+        Mockito.when(shuffler.shuffle()).thenReturn(deckOf21WithTrioInFirst12());
+
+        // WHEN
+        engine.handle(CREATOR, new Action(Action.Type.start_game));
+        engine.handle(CREATOR, new Action(Action.Type.declare_trio));
+        int[] selection = {0, 1, 2};
+        engine.handle(CREATOR, new Action(Action.Type.select_trio, selection));
+
+        // THEN
+        InOrder inOrder = Mockito.inOrder(messagingTemplate);
+        inOrder.verify(messagingTemplate).convertAndSend("/down/games/" + ID, Event.gameStateChanged(Game.State.playing));
+        ArgumentCaptor<Event> drawEventCaptor = ArgumentCaptor.forClass(Event.class);
+        inOrder.verify(messagingTemplate, Mockito.times(3)).convertAndSend(Matchers.eq("/down/games/" + ID), drawEventCaptor.capture());
+        Assert.assertEquals(Event.DrawReason.refill, ((Event.CardsDrawnEvent)drawEventCaptor.getAllValues().get(0)).getReason());
+        Assert.assertEquals(Event.playerDeclaresTrio(engine.getGame().getOwner(), null, engine.getGame().getQueue()), drawEventCaptor.getAllValues().get(1));
+        Assert.assertEquals(Event.trioSelectionSuccess(engine.getGame().getOwner(), selection, 3, engine.getGame().getQueue()), drawEventCaptor.getAllValues().get(2));
+//        Assert.assertEquals(Event.DrawReason.refill, ((Event.CardsDrawnEvent)drawEventCaptor.getAllValues().get(4)).getReason());
+    }
+
+    private Queue<Card> deckOf21WithTrioInFirst12() {
         return new ArrayDeque<>(Arrays.asList(
-                // 0-12
-                new Card(21),
-                new Card(160),
-                new Card(66),
+                // 1-12
+                new Card(0, 0, 0, 0),
+                new Card(1, 0, 0, 0),
+                new Card(2, 0, 0, 0),
                 new Card(82),
                 new Card(138),
                 new Card(32),
@@ -97,9 +119,9 @@ public class EngineTest {
                 new Card(25), new Card(153), new Card(90)
         ));
     }
-    private Queue<Card> deckWithFirstTrioAt19() {
+    private Queue<Card> deckOf21WithFirstTrioAt19() {
         return new ArrayDeque<>(Arrays.asList(
-                // 0-12
+                // 1-12
                 new Card(73),
                 new Card(16),
                 new Card(152),

@@ -2,9 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 <head>
 	<title>Layout</title>
-	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf" th:content="${_csrf} ? ${_csrf.token} : '_'"/>
 	<!-- default header name is X-CSRF-TOKEN -->
-	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+	<meta name="_csrf_header" th:content="${_csrf} ? ${_csrf.headerName} : '_'"/>
 	<link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
 	<link href="/resources/css/trio.css" rel="stylesheet"/>
 	<script src="/webjars/jquery/jquery.min.js"/>
