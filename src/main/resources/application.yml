@@ -9,6 +9,9 @@
 spring:
   application:
     name: trio
+  # default active profile HSQLDB (for dev)
+  profiles:
+    active: hsqldb
   # INTERNATIONALIZATION
   messages:
     basename: messages/messages
@@ -29,8 +32,9 @@ spring:
   data:
     rest:
       base-path: /api
-  profiles:
-    active: hsqldb
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
 
 # ----------------------------------------
 # SERVER PROPERTIES

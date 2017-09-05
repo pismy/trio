@@ -116,7 +116,7 @@ public class GameController {
         }
     }
 
-    @RequestMapping(value = "/{id}/actions", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{id}/actions", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public void handleGameAction(Authentication authentication, @PathVariable("id") String id, @RequestBody Action action) throws ActionException {
         if (authentication != null && authentication.isAuthenticated()) {
