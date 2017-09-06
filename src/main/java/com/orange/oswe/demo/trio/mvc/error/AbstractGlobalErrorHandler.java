@@ -54,7 +54,7 @@ import java.util.Map;
  * error rendering and possibly content negotiation.
  */
 @Controller
-@RequestMapping(GlobalErrorHandler.PATH)
+@RequestMapping(AbstractGlobalErrorHandler.PATH)
 public abstract class AbstractGlobalErrorHandler implements ErrorController {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -418,7 +418,7 @@ public abstract class AbstractGlobalErrorHandler implements ErrorController {
             List<MediaType> types = MediaType.parseMediaTypes(accepts.nextElement());
             for (MediaType type : types) {
                 for (MediaType supported : supportedTypes) {
-                    if (type.equals(supported)) {
+                    if (type.isCompatibleWith(supported)) {
                         return supported;
                     }
                 }
