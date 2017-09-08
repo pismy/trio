@@ -120,12 +120,12 @@ public abstract class Event {
         return new PlayerEvent(Type.player_left, player);
     }
 
-    public static Event playerSelectsTrio(Player player, Integer newScore, Queue<String> queue) {
-        return new GameEvent(Type.player_selects, player, newScore, queue);
+    public static Event playerSelectsTrio(Player player, Queue<String> queue) {
+        return new GameEvent(Type.player_selects, player, null, queue);
     }
 
-    public static Event playerDeclaresTrio(Player player, Integer newScore, Queue<String> queue) {
-        return new GameEvent(Type.player_declares, player, newScore, queue);
+    public static Event playerDeclaresTrio(Player player, Queue<String> queue) {
+        return new GameEvent(Type.player_declares, player, null, queue);
     }
 
     public static Event trioSelectionTimeouted(Player player, Integer newScore, Queue<String> queue) {
@@ -136,8 +136,8 @@ public abstract class Event {
         return new GameEvent(Type.select_giveup, player, newScore, queue);
     }
 
-    public static Event trioSelectionWithdraw(Player player, Integer newScore, Queue<String> queue) {
-        return new GameEvent(Type.select_nolonger, player, newScore, queue);
+    public static Event trioSelectionWithdraw(Player player, Queue<String> queue) {
+        return new GameEvent(Type.select_nolonger, player, null, queue);
     }
 
     public static Event trioSelectionFailure(Player player, List<Card.Attribute> faulty, Integer newScore, Queue<String> queue) {

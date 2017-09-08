@@ -7,6 +7,7 @@ import com.orange.oswe.demo.trio.game.events.Event;
 import com.orange.oswe.demo.trio.game.model.Card;
 import com.orange.oswe.demo.trio.game.model.Game;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +23,7 @@ import java.util.*;
 public class EngineTest {
     public static final String ID = "game";
     public static final User CREATOR = new User("creator", "fullname", "password");
+
     @Mock
     Shuffler shuffler;
 
@@ -75,9 +77,11 @@ public class EngineTest {
     }
 
     @Test
-    public void select_valid_trio_should_succeed() throws ActionException {
+    public void select_valid_trio() throws ActionException {
         // GIVEN
-        Mockito.when(shuffler.shuffle()).thenReturn(deckOf21WithTrioInFirst12());
+        Queue<Card> deck = deckOf21WithTrioInFirst12();
+        Card[] drawnCards = (Card[])new ArrayList(deck).subList(0, 12).toArray(new Card[12]);
+        Mockito.when(shuffler.shuffle()).thenReturn(deck);
 
         // WHEN
         engine.handle(CREATOR, new Action(Action.Type.start_game));
@@ -87,13 +91,63 @@ public class EngineTest {
 
         // THEN
         InOrder inOrder = Mockito.inOrder(messagingTemplate);
-        inOrder.verify(messagingTemplate).convertAndSend("/down/games/" + ID, Event.gameStateChanged(Game.State.playing));
-        ArgumentCaptor<Event> drawEventCaptor = ArgumentCaptor.forClass(Event.class);
-        inOrder.verify(messagingTemplate, Mockito.times(3)).convertAndSend(Matchers.eq("/down/games/" + ID), drawEventCaptor.capture());
-        Assert.assertEquals(Event.DrawReason.refill, ((Event.CardsDrawnEvent)drawEventCaptor.getAllValues().get(0)).getReason());
-        Assert.assertEquals(Event.playerDeclaresTrio(engine.getGame().getOwner(), null, engine.getGame().getQueue()), drawEventCaptor.getAllValues().get(1));
-        Assert.assertEquals(Event.trioSelectionSuccess(engine.getGame().getOwner(), selection, 3, engine.getGame().getQueue()), drawEventCaptor.getAllValues().get(2));
-//        Assert.assertEquals(Event.DrawReason.refill, ((Event.CardsDrawnEvent)drawEventCaptor.getAllValues().get(4)).getReason());
+        ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+        inOrder.verify(messagingTemplate, Mockito.times(4)).convertAndSend(Matchers.eq("/down/games/" + ID), eventCaptor.capture());
+        Assertions.assertThat(eventCaptor.getAllValues()).containsExactly(
+            Event.gameStateChanged(Game.State.playing),
+            Event.cardsDrawn(Event.DrawReason.refill, 81, drawnCards, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}),
+            Event.playerSelectsTrio(engine.getGame().getOwner(), engine.getGame().getQueue()),
+            Event.trioSelectionSuccess(engine.getGame().getOwner(), selection, 3, engine.getGame().getQueue())
+        );
+    }
+
+    @Test
+    public void select_invalid_trio() throws ActionException {
+        // GIVEN
+        Queue<Card> deck = deckOf21WithTrioInFirst12();
+        Card[] drawnCards = (Card[])new ArrayList(deck).subList(0, 12).toArray(new Card[12]);
+        Mockito.when(shuffler.shuffle()).thenReturn(deck);
+
+        // WHEN
+        engine.handle(CREATOR, new Action(Action.Type.start_game));
+        engine.handle(CREATOR, new Action(Action.Type.declare_trio));
+        int[] selection = {0, 1, 3};
+        engine.handle(CREATOR, new Action(Action.Type.select_trio, selection));
+
+        // THEN
+        InOrder inOrder = Mockito.inOrder(messagingTemplate);
+        ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+        inOrder.verify(messagingTemplate, Mockito.times(4)).convertAndSend(Matchers.eq("/down/games/" + ID), eventCaptor.capture());
+        Assertions.assertThat(eventCaptor.getAllValues()).containsExactly(
+                Event.gameStateChanged(Game.State.playing),
+                Event.cardsDrawn(Event.DrawReason.refill, 81, drawnCards, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}),
+                Event.playerSelectsTrio(engine.getGame().getOwner(), engine.getGame().getQueue()),
+                Event.trioSelectionFailure(engine.getGame().getOwner(), Arrays.asList(Card.Attribute.fill, Card.Attribute.number), -1, engine.getGame().getQueue())
+        );
+    }
+
+    @Test
+    public void griveup_trio_selection() throws ActionException {
+        // GIVEN
+        Queue<Card> deck = deckOf21WithTrioInFirst12();
+        Card[] drawnCards = (Card[])new ArrayList(deck).subList(0, 12).toArray(new Card[12]);
+        Mockito.when(shuffler.shuffle()).thenReturn(deck);
+
+        // WHEN
+        engine.handle(CREATOR, new Action(Action.Type.start_game));
+        engine.handle(CREATOR, new Action(Action.Type.declare_trio));
+        engine.handle(CREATOR, new Action(Action.Type.cancel_trio));
+
+        // THEN
+        InOrder inOrder = Mockito.inOrder(messagingTemplate);
+        ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+        inOrder.verify(messagingTemplate, Mockito.times(4)).convertAndSend(Matchers.eq("/down/games/" + ID), eventCaptor.capture());
+        Assertions.assertThat(eventCaptor.getAllValues()).containsExactly(
+                Event.gameStateChanged(Game.State.playing),
+                Event.cardsDrawn(Event.DrawReason.refill, 81, drawnCards, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}),
+                Event.playerSelectsTrio(engine.getGame().getOwner(), engine.getGame().getQueue()),
+                Event.trioSelectionGiveUp(engine.getGame().getOwner(), -1, engine.getGame().getQueue())
+        );
     }
 
     private Queue<Card> deckOf21WithTrioInFirst12() {

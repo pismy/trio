@@ -104,7 +104,7 @@ public class Engine {
             if (game.getQueue().size() == 1) {
                 advanceSelectionQueue();
             } else {
-                broadcast(Event.playerDeclaresTrio(player, null, game.getQueue()));
+                broadcast(Event.playerDeclaresTrio(player, game.getQueue()));
             }
         }
     }
@@ -221,7 +221,7 @@ public class Engine {
             }
 
             // --- broadcast event
-            broadcast(Event.trioSelectionWithdraw(player, null, game.getQueue()));
+            broadcast(Event.trioSelectionWithdraw(player, game.getQueue()));
 
             // --- process selection queue
             advanceSelectionQueue();
@@ -303,7 +303,7 @@ public class Engine {
         } else {
             String playerId = game.getQueue().peek();
             Player player = game.getPlayers().get(playerId);
-            broadcast(Event.playerSelectsTrio(player, null, game.getQueue()));
+            broadcast(Event.playerSelectsTrio(player, game.getQueue()));
             // --- start selection timeout
             selectionTimer = new SelectionTimeout(player);
             timer.schedule(selectionTimer, 5000);
