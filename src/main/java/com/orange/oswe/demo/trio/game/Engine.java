@@ -65,7 +65,6 @@ public class Engine {
         }
         if (game.getPlayers().containsKey(player.getId())) {
             LOGGER.warn("User {} tries to join a game he is already part of. Ignore.", player);
-//            throw new IllegalGameState("You are already part of this game.");
             return;
         }
         game.add(player);
@@ -77,7 +76,6 @@ public class Engine {
         LOGGER.info("User {} leaves", player);
         if (!game.getPlayers().containsKey(player.getId())) {
             LOGGER.warn("User {} tries to quit a game he is not part of. Ignore.", player);
-//            throw new IllegalGameState("You are not part of this game.");
             return;
         }
         // --- change player state
