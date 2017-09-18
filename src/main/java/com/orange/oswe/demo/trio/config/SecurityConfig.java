@@ -122,6 +122,10 @@ public class SecurityConfig {
 		protected void configure(HttpSecurity http) throws Exception {
 			//@formatter:off
 			http
+				.csrf()
+					// ignore our stomp endpoints since they are protected using Stomp headers
+					.ignoringAntMatchers("/trio-websocket/**")
+			.and()
 				.headers()
 					.frameOptions()
 						.sameOrigin()
@@ -141,12 +145,6 @@ public class SecurityConfig {
 					.loginPage("/login")
 					.loginProcessingUrl("/login")
 					.permitAll()
-			.and()
-				.headers()
-					.cacheControl()
-				.and()
-					.frameOptions()
-						.deny()
 			.and()
 				.rememberMe()
 					.useSecureCookie(true)

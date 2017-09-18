@@ -1,0 +1,17 @@
+# ===================================================================
+# "cloud" profile (used in Cloud Foundry env)
+# ===================================================================
+spring:
+  # no active profile
+  profiles:
+    active:
+  # DATASOURCE auto reconfigured
+  jpa:
+    hibernate:
+      naming:
+        strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+flyway:
+  placeholders: {"BIGINT_AUTO_INCREMENT": "BIGINT NOT NULL AUTO_INCREMENT"}

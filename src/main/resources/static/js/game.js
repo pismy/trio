@@ -56,11 +56,11 @@ var animationQueue = new Queue();
  * Connects to the websocket and subscribes to game engine messages
  */
 function connect() {
-    console.log("connecting...");
+    console.log("connecting (csrf: "+csrf+")...");
     var socket = new SockJS('/trio-websocket');
     stompClient = Stomp.over(socket);
     stompClient.debug = null;
-    stompClient.connect({}, function (frame) {
+    stompClient.connect({"X-CSRF-TOKEN": csrf}, function (frame) {
         console.log('... connected: ' + frame);
         stompClient.subscribe('/down/games/'+gameId, handleEvent);
     });
