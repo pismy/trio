@@ -306,9 +306,10 @@
 }
 .symbol {
     position: absolute;
-    width: 100%;
+    width: 63px;
+    left: 5px;
     top: 50%;
-    background: url("cards/symbol000.gif") top center repeat-y;
+    background: url("cards/symbols.png") top center repeat-y;
 }
 .symbol.number1 {
     margin-top: -17px;
@@ -323,86 +324,86 @@
     height: 103px;
 }
 .symbol.fill1.shape1.color1 {
-    background-image: url("cards/symbol000.gif");
+    background-position-x: 0;
 }
 .symbol.fill1.shape1.color2 {
-    background-image: url("cards/symbol001.gif");
+    background-position-x: -63px;
 }
 .symbol.fill1.shape1.color3 {
-    background-image: url("cards/symbol002.gif");
+    background-position-x: -126px;
 }
 .symbol.fill1.shape2.color1 {
-    background-image: url("cards/symbol010.gif");
+    background-position-x: -189px;
 }
 .symbol.fill1.shape2.color2 {
-    background-image: url("cards/symbol011.gif");
+    background-position-x: -252px;
 }
 .symbol.fill1.shape2.color3 {
-    background-image: url("cards/symbol012.gif");
+    background-position-x: -315px;
 }
 .symbol.fill1.shape3.color1 {
-    background-image: url("cards/symbol020.gif");
+    background-position-x: -378px;
 }
 .symbol.fill1.shape3.color2 {
-    background-image: url("cards/symbol021.gif");
+    background-position-x: -441px;
 }
 .symbol.fill1.shape3.color3 {
-    background-image: url("cards/symbol022.gif");
+    background-position-x: -504px;
 }
 
 .symbol.fill2.shape1.color1 {
-    background-image: url("cards/symbol100.gif");
+    background-position-x: -567px;
 }
 .symbol.fill2.shape1.color2 {
-    background-image: url("cards/symbol101.gif");
+    background-position-x: -630px;
 }
 .symbol.fill2.shape1.color3 {
-    background-image: url("cards/symbol102.gif");
+    background-position-x: -693px;
 }
 .symbol.fill2.shape2.color1 {
-    background-image: url("cards/symbol110.gif");
+    background-position-x: -756px;
 }
 .symbol.fill2.shape2.color2 {
-    background-image: url("cards/symbol111.gif");
+    background-position-x: -819px;
 }
 .symbol.fill2.shape2.color3 {
-    background-image: url("cards/symbol112.gif");
+    background-position-x: -882px;
 }
 .symbol.fill2.shape3.color1 {
-    background-image: url("cards/symbol120.gif");
+    background-position-x: -945px;
 }
 .symbol.fill2.shape3.color2 {
-    background-image: url("cards/symbol121.gif");
+    background-position-x: -1008px;
 }
 .symbol.fill2.shape3.color3 {
-    background-image: url("cards/symbol122.gif");
+    background-position-x: -1071px;
 }
 
 
 .symbol.fill3.shape1.color1 {
-    background-image: url("cards/symbol200.gif");
+    background-position-x: -1134px;
 }
 .symbol.fill3.shape1.color2 {
-    background-image: url("cards/symbol201.gif");
+    background-position-x: -1197px;
 }
 .symbol.fill3.shape1.color3 {
-    background-image: url("cards/symbol202.gif");
+    background-position-x: -1260px;
 }
 .symbol.fill3.shape2.color1 {
-    background-image: url("cards/symbol210.gif");
+    background-position-x: -1323px;
 }
 .symbol.fill3.shape2.color2 {
-    background-image: url("cards/symbol211.gif");
+    background-position-x: -1386px;
 }
 .symbol.fill3.shape2.color3 {
-    background-image: url("cards/symbol212.gif");
+    background-position-x: -1449px;
 }
 .symbol.fill3.shape3.color1 {
-    background-image: url("cards/symbol220.gif");
+    background-position-x: -1512px;
 }
 .symbol.fill3.shape3.color2 {
-    background-image: url("cards/symbol221.gif");
+    background-position-x: -1575px;
 }
 .symbol.fill3.shape3.color3 {
-    background-image: url("cards/symbol222.gif");
+    background-position-x: -1638px;
 }
