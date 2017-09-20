@@ -102,3 +102,7 @@ body {
 .trio-login {
     font-size: smaller;
 }
+.user.connected {
+    font-weight: bold;
+    color: green;
+}

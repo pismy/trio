@@ -34,7 +34,7 @@ public class EngineTest {
     Timer timer;
 
     @Mock
-    Engine.InactivityTimeoutListener inactivityTimeoutListener;
+    Engine.GameLifecycleListener inactivityTimeoutListener;
 
     Engine engine;
 

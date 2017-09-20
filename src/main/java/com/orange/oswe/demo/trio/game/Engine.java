@@ -29,19 +29,19 @@ public class Engine {
     private final Game game;
     private final Timer timer = new Timer();
     private final long inactivityTimeoutDelay;
-    private final InactivityTimeoutListener inactivityTimeoutListener;
+    private final GameLifecycleListener gameLifecycleListener;
     private SelectionTimeout selectionTimer;
     private InactivityTimeout inactivityTimeout;
     private boolean trioFoundInQueue = false;
     private Queue<Card> deck;
 
-    public Engine(String id, User creator, Shuffler shuffler, SimpMessagingTemplate messagingTemplate, long inactivityTimeout, InactivityTimeoutListener timeoutListener) {
+    public Engine(String id, User creator, Shuffler shuffler, SimpMessagingTemplate messagingTemplate, long inactivityTimeout, GameLifecycleListener gameLifecycleListener) {
         this.shuffler = shuffler;
         this.messagingTemplate = messagingTemplate;
         game = new Game(id, creator.getUsername());
         game.add(new Player(creator));
         this.inactivityTimeoutDelay = inactivityTimeout;
-        this.inactivityTimeoutListener = timeoutListener;
+        this.gameLifecycleListener = gameLifecycleListener;
         rearmInactivityTimeout();
     }
 
@@ -308,37 +308,32 @@ public class Engine {
         }
     }
 
-    private void playerStartsGame(Player player) throws ActionException {
+    private void playerStartsRound(Player player) throws ActionException {
         checkOwner(player);
 
         if (game.getState() != Game.State.preparing) {
             LOGGER.error("Trying to start a non preparing game. Reject.", player);
             throw new IllegalGameState("This game cannot be started.");
         }
-        // change state
-        game.setState(Game.State.playing);
+        // change state (start)
+        game.start();
         broadcast(Event.gameStateChanged(Game.State.playing));
 
+        // reset deck
         deck = shuffler.shuffle();
-
-        game.reset();
-        game.setState(Game.State.playing);
         trioFoundInQueue = false;
 
         // --- fill the board
         refillBoard();
     }
 
-    private void playerRestartsGame(Player player) throws ActionException {
+    private void playerPreparesNextRound(Player player) throws ActionException {
         checkOwner(player);
-
         if (game.getState() != Game.State.over) {
             LOGGER.error("Trying to restart a non finished game. Reject.", player);
             throw new IllegalGameState("This game cannot be restarted.");
         }
-        game.reset();
-
-        game.setState(Game.State.preparing);
+        game.next();
         broadcast(Event.gameStateChanged(Game.State.preparing));
     }
 
@@ -390,7 +385,7 @@ public class Engine {
         if (trios.isEmpty()) {
             if (!game.hasCardsLeft()) {
                 LOGGER.info("no trio on board and no more cards: end of game");
-                triggerEndOfGame();
+                triggerEndOfRound();
                 return;
             }
             // --- draw 3 extra cards
@@ -406,7 +401,7 @@ public class Engine {
                 }
                 if (!game.hasCardsLeft()) {
                     LOGGER.info("still no trio on board and no more cards: end of game");
-                    triggerEndOfGame();
+                    triggerEndOfRound();
                     return;
                 }
                 LOGGER.info("still no trio on board: replace 3 additional cards");
@@ -416,9 +411,9 @@ public class Engine {
         }
     }
 
-    private void triggerEndOfGame() {
-        game.getQueue().clear();
-        game.setState(Game.State.over);
+    private void triggerEndOfRound() {
+        game.end();
+        gameLifecycleListener.onEndOfRound(this);
         broadcast(Event.gameStateChanged(Game.State.over));
     }
 
@@ -505,10 +500,10 @@ public class Engine {
         Player player = new Player(user);
         switch (action.getType()) {
             case restart_game:
-                playerRestartsGame(player);
+                playerPreparesNextRound(player);
                 break;
             case start_game:
-                playerStartsGame(player);
+                playerStartsRound(player);
                 break;
             case player_join:
                 playerJoins(player);
@@ -555,8 +550,9 @@ public class Engine {
     // ==================================================================
     // === inactivity timeout
     // ==================================================================
-    public interface InactivityTimeoutListener {
+    public interface GameLifecycleListener {
         void onInactivityTimeout(Engine engine);
+        void onEndOfRound(Engine engine);
     }
 
     private void rearmInactivityTimeout() {
@@ -572,7 +568,7 @@ public class Engine {
     private class InactivityTimeout extends TimerTask {
         public void run() {
             LOGGER.warn("Inactivity timeout reached for game {}.", game.getId());
-            inactivityTimeoutListener.onInactivityTimeout(Engine.this);
+            gameLifecycleListener.onInactivityTimeout(Engine.this);
         }
     }
 

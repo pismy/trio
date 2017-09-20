@@ -1,8 +1,7 @@
 package com.orange.oswe.demo.trio.game.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.*;
@@ -50,6 +49,8 @@ public class Game {
     private final String id;
     private final String ownerId;
     private final Instant created = Instant.now();
+    private int round = 1;
+    @Setter(AccessLevel.NONE)
     private State state = State.preparing;
     private Map<String, Player> players = new HashMap<>();
     private Map<String, Integer> scores = new HashMap<>();
@@ -58,14 +59,35 @@ public class Game {
     private Card[] board = new Card[FULL_BOARD_SIZE];
 
     /**
-     * Resets this game to prepare a new match
+     * Resets this game to prepare a new round
      */
-    public void reset() {
+    public void next() {
         state = State.preparing;
         scores = new HashMap<>();
         queue = new ArrayDeque<>();
         cardsLeft = TOTAL_NUMBER_OF_CARDS;
         board = new Card[FULL_BOARD_SIZE];
+        round++;
+    }
+
+    /**
+     * Starts the round
+     */
+    public void start() {
+        state = State.playing;
+        scores = new HashMap<>();
+        queue = new ArrayDeque<>();
+        cardsLeft = TOTAL_NUMBER_OF_CARDS;
+        board = new Card[FULL_BOARD_SIZE];
+    }
+
+    /**
+     * Ends the round
+     */
+    public void end() {
+        state = State.over;
+        queue.clear();
+        // preserve scores
     }
 
     @JsonIgnore

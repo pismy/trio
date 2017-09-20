@@ -1,5 +1,7 @@
 package com.orange.oswe.demo.trio.repository;
 
+import com.orange.oswe.demo.trio.domain.Game;
+import com.orange.oswe.demo.trio.domain.Result;
 import com.orange.oswe.demo.trio.domain.User;
 import com.orange.oswe.demo.trio.game.Engine;
 import com.orange.oswe.demo.trio.game.Shuffler;
@@ -8,10 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by crhx7117 on 22/06/17.
@@ -25,6 +25,9 @@ public class GameRepository {
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+
+    @Autowired
+    private ResultRepository resultRepository;
 
     private final Shuffler shuffler = new Shuffler();
 
@@ -47,13 +50,19 @@ public class GameRepository {
         return findById(id).isPresent();
     }
 
-    private class EngineInactivityListener implements Engine.InactivityTimeoutListener {
+    private class EngineInactivityListener implements Engine.GameLifecycleListener {
         @Override
         public void onInactivityTimeout(Engine engine) {
             id2Game.remove(engine.getGame().getId());
         }
+
+        @Override
+        public void onEndOfRound(Engine engine) {
+            com.orange.oswe.demo.trio.game.model.Game game = engine.getGame();
+            Game gameDb = Game.build(Game.Id.build(game.getId(), game.getRound()), game.getOwner().getUser(), new Date(), null);
+            Set<Result> results = game.getPlayers().values().stream().map(p -> Result.build(null, gameDb, p.getUser(), game.getScore(p.getId()))).collect(Collectors.toSet());
+            gameDb.setResults(results);
+            resultRepository.save(gameDb);
+        }
     }
-
-
-
 }

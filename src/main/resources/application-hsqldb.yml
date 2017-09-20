@@ -4,7 +4,7 @@
 spring:
   # DATASOURCE
   datasource:
-    url: jdbc:hsqldb:file:~/trio-db # ;shutdown=true;hsqldb.write_delay=false
+    url: jdbc:hsqldb:file:~/trio-hsql # ;shutdown=true;hsqldb.write_delay=false
     username: SA
     password:
     driver-class-name: org.hsqldb.jdbc.JDBCDriver
