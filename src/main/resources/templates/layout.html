@@ -54,7 +54,9 @@
 	<footer id="footer" th:fragment="footer">
 		<div class="container">
 			<ul class="list-inline pull-right">
-				<li><a href="https://github.com/pismy/trio/">Trio on GitHub</a></li>
+				<li th:utext="#{info.build(${@buildProperties.group}, ${@buildProperties.name}, ${@buildProperties.version}, ${#calendars.format(@buildProperties.time,'dd/MM/yyyy HH:mm')})}">build <span th:utext="${@buildProperties.}"></span></li>
+				<li>developed by <a href="https://github.com/pismy">pismy</a></li>
+				<li><a href="https://github.com/pismy/trio/" title="Trio on GitHub">GitHub</a></li>
 			</ul>
 		</div>
 	</footer>
