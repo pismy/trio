@@ -1,37 +1,54 @@
+/*
+ * Copyright (C) 2017 Orange
+ *
+ * This software is distributed under the terms and conditions of the 'Apache-2.0'
+ * license which can be found in the file 'LICENSE.txt' in this package distribution
+ * or at 'http://www.apache.org/licenses/LICENSE-2.0'.
+ */
 package com.orange.oswe.demo.trio.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Set;
 
 /**
- * The result of a user in a finished game.
- *
- * TODO: nb players, score, rank
+ * A finished game result.
  */
 @Entity(name = "results")
 @Data
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor(staticName = "build")
 public class Result {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	protected Long id;
+    @Embeddable
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor(staticName = "build")
+    public static class Id implements Serializable {
+        @Column(name = "game_id", nullable = false)
+        String gameId;
+        @Column(nullable = false)
+        int round;
+    }
 
-	@ManyToOne(optional = false)
-	@JoinColumns({
-			@JoinColumn(name = "game_id", referencedColumnName = "game_id"),
-			@JoinColumn(name = "round", referencedColumnName = "round")
-	})
-	private Game game;
+    @EmbeddedId
+    private Id id;
 
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "player_id")
-	private User player;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "owner_id")
+	private User owner;
 
-	@Column(nullable = false)
-	private int score;
+	@Column
+	private Date date;
+
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "result", cascade = CascadeType.ALL)
+	private Set<Score> scores;
+
 }

@@ -7,11 +7,9 @@
  */
 package com.orange.oswe.demo.trio.mvc;
 
-import com.orange.oswe.demo.trio.domain.User;
 import com.orange.oswe.demo.trio.game.Engine;
 import com.orange.oswe.demo.trio.game.model.Game;
 import com.orange.oswe.demo.trio.repository.GameRepository;
-import com.orange.oswe.demo.trio.service.CurrentUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

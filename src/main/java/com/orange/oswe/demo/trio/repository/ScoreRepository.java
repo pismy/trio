@@ -7,11 +7,11 @@
  */
 package com.orange.oswe.demo.trio.repository;
 
-import com.orange.oswe.demo.trio.domain.Result;
+import com.orange.oswe.demo.trio.domain.Score;
 import org.springframework.data.repository.CrudRepository;
 
 /**
- * Repository class for @{{@link Result}} domain objects
+ * Repository class for @{{@link Score}} domain objects
  */
-public interface ScoreRepository extends CrudRepository<Result, Long> {
+public interface ScoreRepository extends CrudRepository<Score, Long> {
 }

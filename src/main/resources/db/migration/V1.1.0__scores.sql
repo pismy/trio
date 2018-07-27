@@ -1,4 +1,4 @@
-CREATE TABLE games (
+CREATE TABLE results (
   game_id VARCHAR(255) NOT NULL,
   round INT NOT NULL,
   date DATETIME NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE games (
     ON DELETE CASCADE
 );
 
-CREATE TABLE results (
+CREATE TABLE scores (
   id ${BIGINT_AUTO_INCREMENT},
   game_id VARCHAR(255) NOT NULL,
   round INT NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE results (
   PRIMARY KEY (id),
   CONSTRAINT FK_game_2_game_id
     FOREIGN KEY (game_id, round)
-    REFERENCES games (game_id, round)
+    REFERENCES results (game_id, round)
     ON DELETE CASCADE,
   CONSTRAINT FK_player_2_user_id
     FOREIGN KEY (player_id)

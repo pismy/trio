@@ -1,7 +1,7 @@
 package com.orange.oswe.demo.trio.repository;
 
-import com.orange.oswe.demo.trio.domain.Game;
 import com.orange.oswe.demo.trio.domain.Result;
+import com.orange.oswe.demo.trio.domain.Score;
 import com.orange.oswe.demo.trio.domain.User;
 import com.orange.oswe.demo.trio.game.Engine;
 import com.orange.oswe.demo.trio.game.Shuffler;
@@ -59,10 +59,10 @@ public class GameRepository {
         @Override
         public void onEndOfRound(Engine engine) {
             com.orange.oswe.demo.trio.game.model.Game game = engine.getGame();
-            Game gameDb = Game.build(Game.Id.build(game.getId(), game.getRound()), game.getOwner().getUser(), new Date(), null);
-            Set<Result> results = game.getPlayers().values().stream().map(p -> Result.build(null, gameDb, p.getUser(), game.getScore(p.getId()))).collect(Collectors.toSet());
-            gameDb.setResults(results);
-            resultRepository.save(gameDb);
+            Result resultDb = Result.build(Result.Id.build(game.getId(), game.getRound()), game.getOwner().getUser(), new Date(), null);
+            Set<Score> scores = game.getPlayers().values().stream().map(p -> Score.build(null, resultDb, p.getUser(), game.getScore(p.getId()))).collect(Collectors.toSet());
+            resultDb.setScores(scores);
+            resultRepository.save(resultDb);
         }
     }
 }
