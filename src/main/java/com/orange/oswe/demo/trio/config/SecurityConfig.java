@@ -43,7 +43,7 @@ public class SecurityConfig {
 	 * <p>
 	 * All other APIs are unauthorized...
 	 */
-	private static final String[] UNSECURED_RESOURCE_LIST = new String[] { "/resources/**" };
+	private static final String[] UNSECURED_RESOURCE_LIST = new String[] { "/resources/**", "/manage/**" };
 	
 	private static final String AUTHORITIES_BY_USERNAME = "select username, authority from user_authorities "
 			+ "inner join users on user_authorities.user_id = users.id "

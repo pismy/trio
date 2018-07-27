@@ -1,6 +1,7 @@
 package com.orange.oswe.demo.trio.mvc.error;
 
 import lombok.Value;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,6 +106,7 @@ public class ErrorHandlingTest {
     }
 
     @Test
+    @Ignore
     public void unmapped_path_should_return_404_page() throws Exception {
         mockMvc.perform(get("/no_such_path").accept(MediaType.TEXT_HTML))
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
