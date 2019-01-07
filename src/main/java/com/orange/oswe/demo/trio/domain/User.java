@@ -8,6 +8,7 @@
 package com.orange.oswe.demo.trio.domain;
 
 import lombok.Data;
+import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,6 +24,7 @@ import java.util.Set;
  */
 @Entity(name = "users")
 @Data
+@ToString(of = {"id", "username", "fullname"})
 public class User implements Serializable, UserDetails {
 
 	private static final long serialVersionUID = 2002390446280945447L;

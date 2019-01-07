@@ -21,6 +21,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
+        <git.branch>unk</git.branch>
+        <git.commit>unk</git.commit>
     </properties>
 
     <dependencies>
@@ -140,6 +142,12 @@
                         <goals>
                             <goal>build-info</goal>
                         </goals>
+                        <configuration>
+                            <additionalProperties>
+                                <git.branch>${git.branch}</git.branch>
+                                <git.commit>${git.commit}</git.commit>
+                            </additionalProperties>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -183,6 +191,21 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
+
+    <profiles>
+        <profile>
+            <id>gitlab-ci-env-detected</id>
+            <activation>
+                <property>
+                    <name>env.CI_COMMIT_REF_NAME</name>
+                </property>
+            </activation>
+            <properties>
+                <git.branch>${env.CI_COMMIT_REF_NAME}</git.branch>
+                <git.commit>${env.CI_COMMIT_SHA}</git.commit>
+            </properties>
+        </profile>
+    </profiles>
 
 
 </project>

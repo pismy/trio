@@ -5,6 +5,8 @@
 	<meta name="_csrf" th:content="${_csrf} ? ${_csrf.token} : '_'"/>
 	<!-- default header name is X-CSRF-TOKEN -->
 	<meta name="_csrf_header" th:content="${_csrf} ? ${_csrf.headerName} : '_'"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+	<meta http-equiv="x-ua-compatible" content="ie=edge"/>
 	<link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
 	<link href="/resources/css/trio.css" rel="stylesheet"/>
 	<script src="/webjars/jquery/jquery.min.js"/>
@@ -54,7 +56,7 @@
 	<footer id="footer" th:fragment="footer">
 		<div class="container">
 			<ul class="list-inline pull-right">
-				<li th:utext="#{info.build(${@buildProperties.group}, ${@buildProperties.name}, ${@buildProperties.version}, ${#calendars.format(@buildProperties.time,'dd/MM/yyyy HH:mm')})}">build <span th:utext="${@buildProperties.}"></span></li>
+				<li th:utext="#{info.build(${@buildProperties.get('git.branch')}, ${@buildProperties.get('git.commit')}, ${#calendars.format(@buildProperties.time,'dd/MM/yyyy HH:mm')})}">build</li>
 				<li>developed by <a href="https://github.com/pismy">pismy</a></li>
 				<li><a href="https://github.com/pismy/trio/" title="Trio on GitHub">GitHub</a></li>
 			</ul>
